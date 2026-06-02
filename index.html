@@ -259,6 +259,26 @@
     .arch-node.signal { border-color: rgba(43,228,208,.45); box-shadow: inset 0 0 0 1px rgba(43,228,208,.1); }
     .arrow { color: var(--muted); font-size: 1.2rem; }
 
+    .why-list { display: grid; gap: 10px; margin-top: 10px; }
+
+    .why-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 11px 12px;
+      border-radius: 13px;
+      background: rgba(255,255,255,.045);
+      border: 1px solid var(--border);
+      color: #dffaff;
+      line-height: 1.42;
+    }
+
+    .why-item::before {
+      content: "→";
+      color: var(--accent);
+      font-weight: 900;
+    }
+
     .receipt {
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       white-space: pre-wrap;
@@ -271,6 +291,25 @@
       font-size: .84rem;
       line-height: 1.5;
     }
+
+    .receipt-summary {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .receipt-row {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 12px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.045);
+      border: 1px solid var(--border);
+    }
+
+    .receipt-row span:first-child { color: var(--muted); }
+    .receipt-row strong { color: #fff; }
 
     .small { font-size: .86rem; color: var(--muted); }
     .footer-note { text-align: center; color: var(--muted); font-size: .88rem; }
@@ -349,6 +388,9 @@
 
         <h3 style="margin-top:22px;">Evidence View</h3>
         <div id="evidenceList" class="evidence-list"></div>
+
+        <h3 style="margin-top:22px;">Why?</h3>
+        <div id="whyList" class="why-list"></div>
       </aside>
     </section>
 
@@ -369,7 +411,10 @@
       </div>
 
       <div class="card">
-        <h2>Evidence Receipt</h2>
+        <h2>Decision Receipt</h2>
+        <p class="small">Board/audit-facing snapshot of why the runtime decision was defensible at the point of consequence formation.</p>
+        <div id="receiptSummary" class="receipt-summary"></div>
+        <h3>Evidence Payload</h3>
         <div id="receipt" class="receipt"></div>
       </div>
     </section>
@@ -452,6 +497,8 @@
     const rationale = document.getElementById("rationale");
     const evidenceList = document.getElementById("evidenceList");
     const receipt = document.getElementById("receipt");
+    const receiptSummary = document.getElementById("receiptSummary");
+    const whyList = document.getElementById("whyList");
     const archDecision = document.getElementById("archDecision");
 
     function renderStep() {
@@ -513,6 +560,38 @@
       return value ? `<span class="pill yes">YES</span>` : `<span class="pill no">NO</span>`;
     }
 
+    function formatCheck(value, warn = false) {
+      if (warn) return "PARTIAL";
+      return value ? "YES" : "NO";
+    }
+
+    function decisionWhy(a) {
+      if (a.decision === "REFUSE") {
+        const points = [];
+        if (a.policy === "blocked") points.push("The policy condition blocks automated continuation.");
+        if (!a.authorityValid && a.risk >= 50) points.push("Authority is uncertain or expired while clinical risk is elevated.");
+        if (a.risk >= 85) points.push("Risk has reached a critical runtime threshold.");
+        if (!a.escalationAvailable) points.push("No escalation owner is available to accept accountability.");
+        if (!a.humanOversightAvailable) points.push("Human clinical oversight is unavailable.");
+        points.push("FlowSignal™ refuses autonomous consequence formation until authority and oversight conditions are restored.");
+        return points;
+      }
+      if (a.decision === "ESCALATE") {
+        const points = [];
+        if (a.riskThresholdCrossed) points.push("Risk threshold has been crossed during the live session.");
+        if (a.owner === "delayed") points.push("Escalation ownership is delayed, so the institution should not treat continuation as routine.");
+        if (a.clinician === "limited") points.push("Human oversight is limited, requiring accountable escalation rather than quiet continuation.");
+        points.push("The recommendation may still be clinically useful, but consequence formation now requires human accountability.");
+        return points;
+      }
+      return [
+        "Authority is currently valid.",
+        "Risk has not crossed the escalation threshold.",
+        "Clinical escalation and human oversight remain available.",
+        "The institution remains justified in allowing monitored continuation."
+      ];
+    }
+
     function updateDecision() {
       const a = assess();
       riskValue.textContent = a.risk;
@@ -533,7 +612,21 @@
         <div class="evidence-item"><span>Operational context valid?</span>${pill(a.operationalContextValid)}</div>
       `;
 
+      whyList.innerHTML = decisionWhy(a).map(item => `<div class="why-item">${item}</div>`).join("");
+
+      const timestamp = new Date().toISOString();
+      receiptSummary.innerHTML = `
+        <div class="receipt-row"><span>Timestamp</span><strong>${timestamp}</strong></div>
+        <div class="receipt-row"><span>Authority</span><strong>${formatCheck(a.authorityValid)}</strong></div>
+        <div class="receipt-row"><span>Escalation</span><strong>${formatCheck(a.escalationAvailable, ownerWarn)}</strong></div>
+        <div class="receipt-row"><span>Risk</span><strong>${a.risk}/100</strong></div>
+        <div class="receipt-row"><span>Human Oversight</span><strong>${formatCheck(a.humanOversightAvailable, clinicianWarn)}</strong></div>
+        <div class="receipt-row"><span>Operational Context</span><strong>${formatCheck(a.operationalContextValid)}</strong></div>
+        <div class="receipt-row"><span>Decision</span><strong>${a.decision}</strong></div>
+      `;
+
       const receiptObject = {
+        timestamp,
         flowsignal_demo: "clinical_admissibility_v1",
         scenario: "deteriorating_mental_health_session",
         current_turn: currentStep + 1,
