@@ -3,679 +3,115 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FlowSignal™ Clinical Admissibility Demonstrator</title>
+  <title>FlowSignal™ Runtime Admissibility Demonstrator</title>
   <style>
     :root {
-      --bg: #071318;
-      --panel: #0d2028;
-      --panel-2: #102a34;
-      --text: #e9fbff;
-      --muted: #9cc3cc;
-      --accent: #2be4d0;
-      --accent-2: #54a7ff;
-      --amber: #f6b93b;
-      --red: #ff5b6e;
-      --green: #54e38e;
-      --border: rgba(255,255,255,0.12);
-      --shadow: 0 18px 55px rgba(0,0,0,.38);
-      --radius: 18px;
+      --bg: #071318; --panel: #0d2028; --panel2: #102a34; --line: rgba(255,255,255,.14);
+      --text: #e9fbff; --muted: #9cc3cc; --accent: #2be4d0; --blue:#54a7ff;
+      --green:#54e38e; --amber:#f6b93b; --orange:#ff9f43; --red:#ff5b6e; --bad:#ff5b6e;
+      --shadow: 0 18px 55px rgba(0,0,0,.35); --radius: 18px;
     }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(43,228,208,.16), transparent 36%),
-        radial-gradient(circle at bottom right, rgba(84,167,255,.14), transparent 34%),
-        var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
-
-    header {
-      padding: 28px clamp(18px, 4vw, 54px) 18px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(7,19,24,.72);
-      backdrop-filter: blur(14px);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 12px;
-    }
-
-    .logo {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: conic-gradient(from 45deg, var(--accent), var(--accent-2), var(--accent));
-      position: relative;
-      box-shadow: 0 0 32px rgba(43,228,208,.25);
-    }
-
-    .logo::before {
-      content: "";
-      position: absolute;
-      inset: 8px;
-      background: var(--bg);
-      border-radius: 50%;
-    }
-
-    .logo::after {
-      content: "";
-      position: absolute;
-      left: 20px;
-      top: 5px;
-      width: 5px;
-      height: 34px;
-      background: linear-gradient(var(--accent), var(--accent-2));
-      clip-path: polygon(50% 0, 100% 45%, 50% 100%, 0 55%);
-      transform: rotate(36deg);
-      border-radius: 6px;
-    }
-
-    h1 { margin: 0; font-size: clamp(1.55rem, 3.2vw, 3rem); letter-spacing: -0.04em; }
-    .subtitle { color: var(--muted); max-width: 980px; margin: 8px 0 0; line-height: 1.55; }
-
-    main {
-      padding: 26px clamp(18px, 4vw, 54px) 54px;
-      display: grid;
-      gap: 22px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1.25fr .75fr;
-      gap: 22px;
-    }
-
-    @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } }
-
-    .card {
-      background: linear-gradient(180deg, rgba(16,42,52,.94), rgba(13,32,40,.94));
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 22px;
-    }
-
-    .card h2, .card h3 { margin: 0 0 14px; letter-spacing: -0.025em; }
-    .card p { color: var(--muted); line-height: 1.55; }
-
-    .scenario-stage {
-      display: grid;
-      gap: 16px;
-    }
-
-    .patient-panel {
-      display: flex;
-      gap: 14px;
-      align-items: center;
-      background: rgba(255,255,255,.045);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px;
-    }
-
-    .status-dot {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: var(--amber);
-      box-shadow: 0 0 24px rgba(246,185,59,.42);
-      flex: 0 0 auto;
-    }
-
-    .status-dot.red { background: var(--red); box-shadow: 0 0 24px rgba(255,91,110,.45); }
-    .status-dot.green { background: var(--green); box-shadow: 0 0 24px rgba(84,227,142,.35); }
-
-    .dialogue {
-      min-height: 250px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding: 16px;
-      background: rgba(0,0,0,.2);
-      border-radius: 16px;
-      border: 1px solid var(--border);
-    }
-
-    .bubble {
-      max-width: 85%;
-      padding: 12px 14px;
-      border-radius: 15px;
-      line-height: 1.45;
-      font-size: .96rem;
-    }
-
-    .bubble.system { background: rgba(43,228,208,.12); border: 1px solid rgba(43,228,208,.22); align-self: flex-start; }
-    .bubble.patient { background: rgba(255,255,255,.09); border: 1px solid var(--border); align-self: flex-end; }
-    .bubble.signal { background: rgba(84,167,255,.13); border: 1px solid rgba(84,167,255,.28); align-self: center; max-width: 100%; }
-
-    .controls {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    @media (max-width: 620px) { .controls { grid-template-columns: 1fr; } }
-
-    .control-box {
-      background: rgba(255,255,255,.045);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
-    }
-
-    label { display: block; color: var(--muted); font-size: .88rem; margin-bottom: 8px; }
-    input[type="range"] { width: 100%; }
-    select, button {
-      width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 11px 12px;
-      background: rgba(7,19,24,.85);
-      color: var(--text);
-      font: inherit;
-    }
-
-    button {
-      cursor: pointer;
-      background: linear-gradient(90deg, rgba(43,228,208,.22), rgba(84,167,255,.22));
-      transition: transform .12s ease, border-color .12s ease;
-      font-weight: 700;
-    }
-
-    button:hover { transform: translateY(-1px); border-color: rgba(43,228,208,.5); }
-
-    .button-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-    @media (max-width: 620px) { .button-row { grid-template-columns: 1fr; } }
-
-    .decision {
-      text-align: center;
-      border-radius: 18px;
-      padding: 24px;
-      background: rgba(255,255,255,.05);
-      border: 1px solid var(--border);
-    }
-
-    .decision .label { color: var(--muted); text-transform: uppercase; letter-spacing: .14em; font-size: .75rem; }
-    .decision .value { font-size: clamp(2.2rem, 8vw, 4.4rem); font-weight: 900; letter-spacing: -0.07em; margin-top: 5px; }
-    .decision.allow .value { color: var(--green); }
-    .decision.escalate .value { color: var(--amber); }
-    .decision.refuse .value { color: var(--red); }
-
-    .rationale {
-      margin-top: 12px;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    .evidence-list { display: grid; gap: 10px; }
-
-    .evidence-item {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 12px;
-      align-items: center;
-      padding: 12px;
-      border-radius: 13px;
-      background: rgba(255,255,255,.045);
-      border: 1px solid var(--border);
-    }
-
-    .pill {
-      padding: 5px 10px;
-      border-radius: 999px;
-      font-weight: 800;
-      font-size: .78rem;
-    }
-
-    .yes { color: #052414; background: var(--green); }
-    .no { color: #2b0509; background: var(--red); }
-    .warn { color: #291a03; background: var(--amber); }
-
-    .architecture {
-      display: grid;
-      gap: 10px;
-      text-align: center;
-    }
-
-    .arch-node {
-      padding: 14px;
-      border-radius: 14px;
-      background: rgba(255,255,255,.05);
-      border: 1px solid var(--border);
-      font-weight: 750;
-    }
-
-    .arch-node.signal { border-color: rgba(43,228,208,.45); box-shadow: inset 0 0 0 1px rgba(43,228,208,.1); }
-    .arrow { color: var(--muted); font-size: 1.2rem; }
-
-    .why-list { display: grid; gap: 10px; margin-top: 10px; }
-
-    .why-item {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      padding: 11px 12px;
-      border-radius: 13px;
-      background: rgba(255,255,255,.045);
-      border: 1px solid var(--border);
-      color: #dffaff;
-      line-height: 1.42;
-    }
-
-    .why-item::before {
-      content: "→";
-      color: var(--accent);
-      font-weight: 900;
-    }
-
-    .receipt {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      white-space: pre-wrap;
-      background: rgba(0,0,0,.28);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
-      color: #cdf8ff;
-      overflow-x: auto;
-      font-size: .84rem;
-      line-height: 1.5;
-    }
-
-    .receipt-summary {
-      display: grid;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .receipt-row {
-      display: grid;
-      grid-template-columns: 180px 1fr;
-      gap: 12px;
-      padding: 9px 10px;
-      border-radius: 10px;
-      background: rgba(255,255,255,.045);
-      border: 1px solid var(--border);
-    }
-
-    .receipt-row span:first-child { color: var(--muted); }
-    .receipt-row strong { color: #fff; }
-
-    .small { font-size: .86rem; color: var(--muted); }
-    .footer-note { text-align: center; color: var(--muted); font-size: .88rem; }
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(circle at top left,rgba(43,228,208,.16),transparent 32%),radial-gradient(circle at bottom right,rgba(84,167,255,.12),transparent 35%),var(--bg);color:var(--text);}
+    header{display:flex;gap:18px;align-items:center;padding:30px clamp(18px,4vw,58px) 22px;border-bottom:1px solid var(--line);background:rgba(7,19,24,.8);position:sticky;top:0;z-index:3;backdrop-filter: blur(8px)}
+    .logo{width:40px;height:40px;border-radius:50%;border:8px solid #38d9f7;position:relative;box-shadow:0 0 24px rgba(43,228,208,.35)} .logo:after{content:"";position:absolute;width:8px;height:34px;background:#071318;transform:rotate(42deg);left:8px;top:-5px;border-radius:8px}
+    h1{margin:0;font-size:clamp(30px,4vw,54px);line-height:1}.sub{margin:10px 0 0;color:var(--muted);max-width:1100px;font-size:16px}.wrap{padding:26px clamp(14px,3vw,38px);display:grid;grid-template-columns:1.08fr .95fr .9fr;gap:18px;align-items:start}
+    .card{background:linear-gradient(180deg,rgba(16,42,52,.96),rgba(8,27,34,.96));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}.card h2{font-size:22px;margin:0 0 14px}.card h3{font-size:15px;margin:16px 0 9px;color:#dffcff}.muted{color:var(--muted);font-size:13px}.status{display:flex;align-items:center;gap:12px;padding:16px;border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:13px;margin-bottom:14px}.dot{width:16px;height:16px;border-radius:50%;background:var(--amber);box-shadow:0 0 14px rgba(246,185,59,.55)}.dot.green{background:var(--green)}.dot.orange{background:var(--orange)}.dot.red{background:var(--red)}
+    .conversation{min-height:235px;border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.15);padding:16px;display:flex;flex-direction:column;gap:14px}.bubble{max-width:72%;padding:12px 14px;border-radius:14px;border:1px solid rgba(43,228,208,.35);background:rgba(43,228,208,.10);font-weight:700}.bubble.patient{margin-left:auto;background:rgba(255,255,255,.07);border-color:var(--line)}
+    .controls{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}button{border:1px solid rgba(43,228,208,.28);background:linear-gradient(135deg,rgba(43,228,208,.28),rgba(84,167,255,.25));color:var(--text);font-weight:800;border-radius:10px;padding:13px;cursor:pointer}button:hover{filter:brightness(1.12)}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:13px;padding:13px}label{display:block;color:#8edbe6;font-size:13px;margin-bottom:8px}select,input[type=range]{width:100%}select{padding:12px;border-radius:10px;background:#061217;color:white;border:1px solid var(--line);font-weight:800}.decisionBox{text-align:center;border:1px solid var(--line);border-radius:15px;padding:22px;background:rgba(255,255,255,.05)}.eyebrow{letter-spacing:.24em;text-transform:uppercase;color:#8edbe6;font-size:11px}.decision{font-size:62px;font-weight:950;line-height:1;margin:10px 0}.allow{color:var(--green)}.escalate{color:var(--amber)}.refuse{color:var(--red)}
+    .row{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:10px;padding:10px 12px;margin:7px 0;font-weight:800}.pill{font-size:12px;border-radius:999px;padding:5px 10px;font-weight:950}.yes{background:var(--green);color:#04210d}.no{background:var(--bad);color:#26020a}.neutral{background:#173845;color:#cef9ff;border:1px solid var(--line)}.gateApproved{background:rgba(84,227,142,.12);border-color:rgba(84,227,142,.45)}.gateBlocked{background:rgba(255,91,110,.12);border-color:rgba(255,91,110,.45)}
+    .pipeline{display:flex;flex-direction:column;gap:8px}.node{border:1px solid var(--line);background:rgba(255,255,255,.045);border-radius:10px;padding:11px;text-align:center;font-weight:900}.node.live{border-color:rgba(43,228,208,.85);box-shadow:0 0 18px rgba(43,228,208,.15)}.arrow{text-align:center;color:#80eefa;font-weight:900}.authority{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.authbox{border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center;font-weight:950;font-size:12px;opacity:.45}.authbox.active{opacity:1;transform:translateY(-1px);box-shadow:0 0 16px rgba(255,255,255,.08)}.normal.active{border-color:var(--green);color:var(--green)}.conditional.active{border-color:var(--amber);color:var(--amber)}.escalated.active{border-color:var(--orange);color:var(--orange)}.restricted.active{border-color:var(--red);color:var(--red)}
+    .justify{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.jitem{border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center;font-weight:900}.ok{color:var(--green)}.bad{color:var(--red)}.why li,.timeline li{margin:7px 0}.why{padding-left:20px}.timeline{max-height:235px;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:10px 10px 10px 28px;background:rgba(0,0,0,.12);font-size:13px}.receipt{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;white-space:pre-wrap;background:#050e12;border:1px solid var(--line);border-radius:12px;padding:14px;max-height:310px;overflow:auto}.smallgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.kpi{border:1px solid var(--line);border-radius:10px;padding:10px;background:rgba(255,255,255,.04)}.kpi b{display:block;margin-top:4px}.footerNote{padding:0 clamp(14px,3vw,38px) 22px;color:var(--muted);font-size:12px}
+    @media(max-width:1250px){.wrap{grid-template-columns:1fr 1fr}.wide{grid-column:1/-1}} @media(max-width:850px){.wrap{grid-template-columns:1fr}.formgrid,.smallgrid,.justify,.authority{grid-template-columns:1fr}.decision{font-size:48px}.bubble{max-width:95%}header{align-items:flex-start}}
   </style>
 </head>
 <body>
-  <header>
-    <div class="brand">
-      <div class="logo" aria-label="FlowSignal compass logo"></div>
-      <div>
-        <h1>FlowSignal™ Clinical Admissibility Demonstrator</h1>
-        <p class="subtitle">Scenario 1: deteriorating mental health session. The model may still be clinically helpful — but FlowSignal™ evaluates whether the institution remains justified in allowing consequence to form.</p>
-      </div>
+<header><div class="logo"></div><div><h1>FlowSignal™ Runtime Admissibility Demonstrator</h1><p class="sub">Demonstrating how institutional authority, escalation readiness and admissibility evolve during an AI-assisted clinical workflow. The clinical gate may approve a proposed action — but FlowSignal™ evaluates whether consequence formation remains justified at runtime.</p></div></header>
+<main class="wrap">
+  <section class="card">
+    <h2>Live Clinical Session</h2>
+    <div class="status"><span id="ragDot" class="dot"></span><div><b id="stateLine">Patient state: AMBER</b><br><span class="muted" id="turnLine">Turn 1 of 6 · Session active</span></div></div>
+    <div class="conversation" id="conversation"></div>
+    <div class="controls"><button onclick="back()">Back</button><button onclick="advance()">Advance Conversation</button><button onclick="resetDemo()">Reset</button></div>
+    <div class="formgrid">
+      <div class="field"><label>Risk intensity: <b id="riskLabel">35</b>/100</label><input id="risk" type="range" min="0" max="100" value="35" oninput="manualRisk(this.value)"></div>
+      <div class="field"><label>Proposed clinical action</label><select id="action" onchange="update()"><option value="exercise_offer">Exercise offer</option><option value="wrap_up_delivery">Session wrap-up</option><option value="assertive_intervention">Assertive intervention</option></select></div>
+      <div class="field"><label>Policy condition</label><select id="policy" onchange="update()"><option value="valid">Policy valid</option><option value="blocked">Policy blocked</option></select></div>
+      <div class="field"><label>Escalation owner</label><select id="owner" onchange="update()"><option value="available">Available</option><option value="missing">Unavailable</option></select></div>
+      <div class="field"><label>Human oversight</label><select id="clinician" onchange="update()"><option value="available">Clinician available</option><option value="missing">Clinician unavailable</option></select></div>
+      <div class="field"><label>Operational context</label><select id="ops" onchange="update()"><option value="valid">Operational context valid</option><option value="invalid">Operational context invalid</option></select></div>
     </div>
-  </header>
+  </section>
 
-  <main>
-    <section class="grid">
-      <div class="card scenario-stage">
-        <h2>Live Clinical Workflow</h2>
-        <div class="patient-panel">
-          <div id="statusDot" class="status-dot"></div>
-          <div>
-            <strong id="stateText">Patient state: AMBER</strong>
-            <div class="small" id="turnText">Turn 1 of 6 · Session active</div>
-          </div>
-        </div>
+  <section class="card">
+    <h2>Governance Pipeline</h2>
+    <div class="pipeline">
+      <div class="node">Mental Health Session</div><div class="arrow">↓</div>
+      <div class="node">Clinical AI Recommendation</div><div class="arrow">↓</div>
+      <div class="node" id="gateNode">Lumara Clinical Gate<br><span id="gateNodeText" class="muted">APPROVED / BLOCKED</span></div><div class="arrow">↓</div>
+      <div class="node live">FlowSignal™ Runtime Admissibility</div><div class="arrow">↓</div>
+      <div class="node" id="decisionNode">ALLOW / ESCALATE / REFUSE</div><div class="arrow">↓</div>
+      <div class="node">Clinical Action or Human Escalation</div>
+    </div>
+    <h3>Lumara Clinical Gate</h3><div class="row" id="gateRow"><span>Policy gate status</span><span class="pill yes" id="gateStatus">APPROVED</span></div>
+    <p class="muted" id="gateReason">Clinical policy conditions are currently satisfied for the proposed action.</p>
+    <h3>Runtime Authority State</h3><div class="authority"><div id="aNormal" class="authbox normal">NORMAL</div><div id="aConditional" class="authbox conditional">CONDITIONAL</div><div id="aEscalated" class="authbox escalated">ESCALATED</div><div id="aRestricted" class="authbox restricted">RESTRICTED</div></div>
+    <h3>Institutional Justification</h3><div class="justify"><div class="jitem" id="jMonitor">✓ Monitoring</div><div class="jitem" id="jEscalate">✓ Escalation</div><div class="jitem" id="jAuto">✓ Autonomous continuation</div></div>
+  </section>
 
-        <div id="dialogue" class="dialogue"></div>
+  <section class="card">
+    <h2>Runtime Decision</h2>
+    <div class="decisionBox"><div class="eyebrow">FlowSignal™ Decision</div><div id="decision" class="decision allow">ALLOW</div><p id="decisionText" class="muted">Authority, oversight and operational context are sufficient for monitored continuation.</p></div>
+    <h3>Evidence View</h3><div id="evidence"></div>
+    <h3>Why?</h3><ul class="why" id="why"></ul>
+  </section>
 
-        <div class="button-row">
-          <button id="prevBtn">Back</button>
-          <button id="nextBtn">Advance Conversation</button>
-          <button id="resetBtn">Reset</button>
-        </div>
+  <section class="card wide">
+    <h2>Decision Timeline</h2><p class="muted">Runtime sequence showing when the authority state and admissibility decision changed.</p><ol class="timeline" id="timeline"></ol>
+  </section>
 
-        <div class="controls">
-          <div class="control-box">
-            <label for="riskSlider">Risk intensity: <strong id="riskValue">35</strong>/100</label>
-            <input id="riskSlider" type="range" min="0" max="100" value="35" />
-          </div>
-          <div class="control-box">
-            <label for="policySelect">Policy condition</label>
-            <select id="policySelect">
-              <option value="valid">Policy valid</option>
-              <option value="expired">Policy expired / uncertain</option>
-              <option value="blocked">Policy prohibits automated continuation</option>
-            </select>
-          </div>
-          <div class="control-box">
-            <label for="ownerSelect">Escalation owner</label>
-            <select id="ownerSelect">
-              <option value="available">Available</option>
-              <option value="delayed">Delayed</option>
-              <option value="missing">Unavailable</option>
-            </select>
-          </div>
-          <div class="control-box">
-            <label for="clinicianSelect">Human oversight</label>
-            <select id="clinicianSelect">
-              <option value="available">Clinician available</option>
-              <option value="limited">Limited cover</option>
-              <option value="unavailable">Clinician unavailable</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <aside class="card">
-        <h2>Runtime Decision</h2>
-        <div id="decisionBox" class="decision allow">
-          <div class="label">FlowSignal™ decision</div>
-          <div id="decisionValue" class="value">ALLOW</div>
-          <div id="rationale" class="rationale"></div>
-        </div>
-
-        <h3 style="margin-top:22px;">Evidence View</h3>
-        <div id="evidenceList" class="evidence-list"></div>
-
-        <h3 style="margin-top:22px;">Why?</h3>
-        <div id="whyList" class="why-list"></div>
-      </aside>
-    </section>
-
-    <section class="grid">
-      <div class="card">
-        <h2>Architecture View</h2>
-        <div class="architecture">
-          <div class="arch-node">AI Model</div>
-          <div class="arrow">↓</div>
-          <div class="arch-node">Clinical Recommendation</div>
-          <div class="arrow">↓</div>
-          <div class="arch-node signal">FlowSignal™ Runtime Admissibility Layer</div>
-          <div class="arrow">↓</div>
-          <div id="archDecision" class="arch-node">ALLOW / ESCALATE / REFUSE</div>
-          <div class="arrow">↓</div>
-          <div class="arch-node">Clinical Action or Human Escalation</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>Decision Receipt</h2>
-        <p class="small">Board/audit-facing snapshot of why the runtime decision was defensible at the point of consequence formation.</p>
-        <div id="receiptSummary" class="receipt-summary"></div>
-        <h3>Evidence Payload</h3>
-        <div id="receipt" class="receipt"></div>
-      </div>
-    </section>
-
-    <p class="footer-note">Demonstrator only. FlowSignal™ does not diagnose, triage or provide clinical advice. It evaluates execution admissibility before consequence formation.</p>
-  </main>
-
-  <script>
-    const steps = [
-      {
-        state: "AMBER",
-        risk: 35,
-        messages: [
-          ["system", "The session begins with the patient presenting at AMBER distress."],
-          ["patient", "I’m struggling today, but I don’t want to make a big deal of it."],
-          ["system", "Support option offered: guided grounding exercise and clinician follow-up if needed."]
-        ]
-      },
-      {
-        state: "AMBER",
-        risk: 44,
-        messages: [
-          ["patient", "No, I don’t want the exercise. It won’t help."],
-          ["system", "First support offer declined. Session continues under monitored authority."],
-          ["signal", "FlowSignal™ check: authority remains valid; escalation not yet mandatory."]
-        ]
-      },
-      {
-        state: "AMBER+",
-        risk: 58,
-        messages: [
-          ["patient", "I said no. I’m tired of people pretending this gets better."],
-          ["system", "Second support offer presented with lower-friction alternative."],
-          ["patient", "No. Stop asking."],
-          ["signal", "FlowSignal™ check: refusal pattern and intensity are increasing."]
-        ]
-      },
-      {
-        state: "HIGH AMBER",
-        risk: 68,
-        messages: [
-          ["patient", "Nobody is listening. I’m done with this."],
-          ["system", "Language intensity worsens without explicit crisis content."],
-          ["signal", "FlowSignal™ check: trajectory now requires escalation readiness assessment."]
-        ]
-      },
-      {
-        state: "RED TRAJECTORY",
-        risk: 82,
-        messages: [
-          ["patient", "Just leave me alone. I can’t keep doing this."],
-          ["system", "Risk trajectory crosses escalation threshold."],
-          ["signal", "FlowSignal™ check: continuation authority depends on available human oversight and escalation pathway."]
-        ]
-      },
-      {
-        state: "RED",
-        risk: 92,
-        messages: [
-          ["patient", "I don’t want to talk anymore."],
-          ["system", "Clinical consequence boundary reached."],
-          ["signal", "FlowSignal™ final check: should the system continue, escalate, or refuse autonomous continuation?" ]
-        ]
-      }
-    ];
-
-    let currentStep = 0;
-
-    const dialogue = document.getElementById("dialogue");
-    const statusDot = document.getElementById("statusDot");
-    const stateText = document.getElementById("stateText");
-    const turnText = document.getElementById("turnText");
-    const riskSlider = document.getElementById("riskSlider");
-    const riskValue = document.getElementById("riskValue");
-    const policySelect = document.getElementById("policySelect");
-    const ownerSelect = document.getElementById("ownerSelect");
-    const clinicianSelect = document.getElementById("clinicianSelect");
-    const decisionBox = document.getElementById("decisionBox");
-    const decisionValue = document.getElementById("decisionValue");
-    const rationale = document.getElementById("rationale");
-    const evidenceList = document.getElementById("evidenceList");
-    const receipt = document.getElementById("receipt");
-    const receiptSummary = document.getElementById("receiptSummary");
-    const whyList = document.getElementById("whyList");
-    const archDecision = document.getElementById("archDecision");
-
-    function renderStep() {
-      const step = steps[currentStep];
-      dialogue.innerHTML = step.messages.map(([type, text]) => `<div class="bubble ${type}">${text}</div>`).join("");
-      riskSlider.value = step.risk;
-      stateText.textContent = `Patient state: ${step.state}`;
-      turnText.textContent = `Turn ${currentStep + 1} of ${steps.length} · Session active`;
-      statusDot.className = "status-dot" + (step.risk >= 80 ? " red" : step.risk < 45 ? "" : "");
-      updateDecision();
-    }
-
-    function assess() {
-      const risk = Number(riskSlider.value);
-      const policy = policySelect.value;
-      const owner = ownerSelect.value;
-      const clinician = clinicianSelect.value;
-
-      const authorityValid = policy === "valid";
-      const escalationAvailable = owner !== "missing";
-      const riskThresholdCrossed = risk >= 70;
-      const humanOversightAvailable = clinician !== "unavailable";
-      const operationalContextValid = owner !== "missing" && clinician !== "unavailable";
-
-      let decision = "ALLOW";
-      let reason = "Authority, oversight and operational context are sufficient for monitored continuation.";
-
-      if (policy === "blocked") {
-        decision = "REFUSE";
-        reason = "Policy prohibits automated continuation. Consequence formation must not proceed through the system.";
-      } else if (!authorityValid && risk >= 50) {
-        decision = "REFUSE";
-        reason = "Authority is uncertain or expired while risk is elevated. The system cannot justify continued autonomous action.";
-      } else if (risk >= 85 && (!humanOversightAvailable || !escalationAvailable)) {
-        decision = "REFUSE";
-        reason = "Risk is critical and the required escalation or human oversight pathway is unavailable.";
-      } else if (riskThresholdCrossed || owner === "delayed" || clinician === "limited") {
-        decision = "ESCALATE";
-        reason = "Risk trajectory or reduced coverage means the institution should move from autonomous continuation to accountable escalation.";
-      }
-
-      return {
-        risk,
-        policy,
-        owner,
-        clinician,
-        authorityValid,
-        escalationAvailable,
-        riskThresholdCrossed,
-        humanOversightAvailable,
-        operationalContextValid,
-        decision,
-        reason
-      };
-    }
-
-    function pill(value, warn = false) {
-      if (warn) return `<span class="pill warn">PARTIAL</span>`;
-      return value ? `<span class="pill yes">YES</span>` : `<span class="pill no">NO</span>`;
-    }
-
-    function formatCheck(value, warn = false) {
-      if (warn) return "PARTIAL";
-      return value ? "YES" : "NO";
-    }
-
-    function decisionWhy(a) {
-      if (a.decision === "REFUSE") {
-        const points = [];
-        if (a.policy === "blocked") points.push("The policy condition blocks automated continuation.");
-        if (!a.authorityValid && a.risk >= 50) points.push("Authority is uncertain or expired while clinical risk is elevated.");
-        if (a.risk >= 85) points.push("Risk has reached a critical runtime threshold.");
-        if (!a.escalationAvailable) points.push("No escalation owner is available to accept accountability.");
-        if (!a.humanOversightAvailable) points.push("Human clinical oversight is unavailable.");
-        points.push("FlowSignal™ refuses autonomous consequence formation until authority and oversight conditions are restored.");
-        return points;
-      }
-      if (a.decision === "ESCALATE") {
-        const points = [];
-        if (a.riskThresholdCrossed) points.push("Risk threshold has been crossed during the live session.");
-        if (a.owner === "delayed") points.push("Escalation ownership is delayed, so the institution should not treat continuation as routine.");
-        if (a.clinician === "limited") points.push("Human oversight is limited, requiring accountable escalation rather than quiet continuation.");
-        points.push("The recommendation may still be clinically useful, but consequence formation now requires human accountability.");
-        return points;
-      }
-      return [
-        "Authority is currently valid.",
-        "Risk has not crossed the escalation threshold.",
-        "Clinical escalation and human oversight remain available.",
-        "The institution remains justified in allowing monitored continuation."
-      ];
-    }
-
-    function updateDecision() {
-      const a = assess();
-      riskValue.textContent = a.risk;
-
-      decisionValue.textContent = a.decision;
-      decisionBox.className = `decision ${a.decision.toLowerCase()}`;
-      rationale.textContent = a.reason;
-      archDecision.textContent = a.decision;
-
-      const ownerWarn = a.owner === "delayed";
-      const clinicianWarn = a.clinician === "limited";
-
-      evidenceList.innerHTML = `
-        <div class="evidence-item"><span>Authority valid?</span>${pill(a.authorityValid)}</div>
-        <div class="evidence-item"><span>Clinical escalation available?</span>${pill(a.escalationAvailable, ownerWarn)}</div>
-        <div class="evidence-item"><span>Risk threshold crossed?</span>${pill(a.riskThresholdCrossed)}</div>
-        <div class="evidence-item"><span>Human oversight available?</span>${pill(a.humanOversightAvailable, clinicianWarn)}</div>
-        <div class="evidence-item"><span>Operational context valid?</span>${pill(a.operationalContextValid)}</div>
-      `;
-
-      whyList.innerHTML = decisionWhy(a).map(item => `<div class="why-item">${item}</div>`).join("");
-
-      const timestamp = new Date().toISOString();
-      receiptSummary.innerHTML = `
-        <div class="receipt-row"><span>Timestamp</span><strong>${timestamp}</strong></div>
-        <div class="receipt-row"><span>Authority</span><strong>${formatCheck(a.authorityValid)}</strong></div>
-        <div class="receipt-row"><span>Escalation</span><strong>${formatCheck(a.escalationAvailable, ownerWarn)}</strong></div>
-        <div class="receipt-row"><span>Risk</span><strong>${a.risk}/100</strong></div>
-        <div class="receipt-row"><span>Human Oversight</span><strong>${formatCheck(a.humanOversightAvailable, clinicianWarn)}</strong></div>
-        <div class="receipt-row"><span>Operational Context</span><strong>${formatCheck(a.operationalContextValid)}</strong></div>
-        <div class="receipt-row"><span>Decision</span><strong>${a.decision}</strong></div>
-      `;
-
-      const receiptObject = {
-        timestamp,
-        flowsignal_demo: "clinical_admissibility_v1",
-        scenario: "deteriorating_mental_health_session",
-        current_turn: currentStep + 1,
-        patient_state: steps[currentStep].state,
-        risk_score: a.risk,
-        checks: {
-          authority_valid: a.authorityValid,
-          clinical_escalation_available: a.escalationAvailable,
-          risk_threshold_crossed: a.riskThresholdCrossed,
-          human_oversight_available: a.humanOversightAvailable,
-          operational_context_valid: a.operationalContextValid
-        },
-        inputs: {
-          policy_condition: a.policy,
-          escalation_owner: a.owner,
-          clinician_availability: a.clinician
-        },
-        decision: a.decision,
-        rationale: a.reason,
-        boundary_statement: "Recommendation may be clinically useful but consequence formation requires runtime admissibility."
-      };
-
-      receipt.textContent = JSON.stringify(receiptObject, null, 2);
-    }
-
-    document.getElementById("nextBtn").addEventListener("click", () => {
-      currentStep = Math.min(currentStep + 1, steps.length - 1);
-      renderStep();
-    });
-
-    document.getElementById("prevBtn").addEventListener("click", () => {
-      currentStep = Math.max(currentStep - 1, 0);
-      renderStep();
-    });
-
-    document.getElementById("resetBtn").addEventListener("click", () => {
-      currentStep = 0;
-      policySelect.value = "valid";
-      ownerSelect.value = "available";
-      clinicianSelect.value = "available";
-      renderStep();
-    });
-
-    [riskSlider, policySelect, ownerSelect, clinicianSelect].forEach(el => {
-      el.addEventListener("input", updateDecision);
-      el.addEventListener("change", updateDecision);
-    });
-
-    renderStep();
-  </script>
+  <section class="card wide">
+    <h2>Decision Receipt</h2><p class="muted">Board/audit-facing snapshot of why the runtime decision was defensible at the point of consequence formation.</p><div class="smallgrid" id="receiptRows"></div><h3>Evidence Payload</h3><div class="receipt" id="payload"></div>
+  </section>
+</main>
+<div class="footerNote">FlowSignal™ does not diagnose clinical risk. This demonstrator assumes a clinical risk signal exists and shows how runtime admissibility, institutional authority and consequence formation are evaluated independently.</div>
+<script>
+const turns=[
+ {state:'AMBER',risk:35,action:'exercise_offer',policy:'valid',patient:'I’m struggling today, but I don’t want to make a big deal of it.',system:'The session begins with the patient presenting at AMBER distress. Support option offered: guided grounding exercise and clinician follow-up if needed.',event:'Session started · AMBER distress · exercise offered'},
+ {state:'AMBER',risk:48,action:'exercise_offer',policy:'valid',patient:'No, I don’t want the exercise. It won’t help anyway.',system:'Patient declines the first support offer. FlowSignal continues monitored admissibility evaluation.',event:'Support declined once · risk rising'},
+ {state:'AMBER',risk:58,action:'exercise_offer',policy:'valid',patient:'Please stop asking. I said I don’t want help.',system:'Second support offer is declined. Authority becomes conditional as refusal pattern and distress trajectory increase.',event:'Support declined twice · authority becoming conditional'},
+ {state:'RED trajectory',risk:72,action:'assertive_intervention',policy:'valid',patient:'Everything is closing in. I don’t know how much longer I can do this.',system:'Language intensity worsens. Risk threshold crossed. Escalation readiness is now required before consequence can form.',event:'Risk threshold crossed · escalation readiness required'},
+ {state:'RED trajectory',risk:84,action:'assertive_intervention',policy:'valid',patient:'I’m not safe with myself right now.',system:'Assertive clinical escalation is proposed. FlowSignal checks policy gate result, escalation owner, clinician availability and operational feasibility.',event:'Assertive intervention proposed · admissibility check intensified'},
+ {state:'RED',risk:91,action:'assertive_intervention',policy:'valid',patient:'I need someone now.',system:'RED state. FlowSignal restricts autonomous continuation and requires available clinical escalation pathway.',event:'RED state reached · autonomous continuation restricted'}
+];
+let idx=0; let timeline=[]; let lastAuthority=''; let lastDecision='';
+function now(){return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});} function log(msg){timeline.push(`${now()}  ${msg}`); renderTimeline();}
+function val(id){return document.getElementById(id).value}
+function setVal(id,v){document.getElementById(id).value=v}
+function authority(risk,owner,clinician,ops){ if(owner==='missing'||clinician==='missing'||ops==='invalid'||risk>=85) return 'RESTRICTED'; if(risk>=70) return 'ESCALATED'; if(risk>=50) return 'CONDITIONAL'; return 'NORMAL'; }
+function gate(action,policy,risk){ if(policy==='blocked') return {ok:false, reason:'Clinical policy condition has explicitly blocked the proposed action.'}; if(action==='exercise_offer' && risk>=70) return {ok:false, reason:'Exercise offer blocked because crisis trajectory is active.'}; if(action==='wrap_up_delivery' && risk>=70) return {ok:false, reason:'Standard wrap-up blocked because the session is in crisis trajectory.'}; return {ok:true, reason:'Clinical policy conditions are currently satisfied for the proposed action.'}; }
+function decisionFor(g,auth,risk,owner,clinician,ops){ if(!g.ok) return 'REFUSE'; if(auth==='RESTRICTED') return 'REFUSE'; if(risk>=70) return 'ESCALATE'; if(risk>=50) return 'ESCALATE'; return 'ALLOW'; }
+function justification(auth,decision){ const monitor=true; const escalation=(auth!=='RESTRICTED' || decision==='ESCALATE'); const auto=(auth==='NORMAL'||auth==='CONDITIONAL') && decision==='ALLOW'; return {monitor,escalation,auto}; }
+function applyTurn(){ const t=turns[idx]; setVal('risk',t.risk); setVal('action',t.action); setVal('policy',t.policy); renderConversation(); log(t.event); update(true); }
+function renderConversation(){ const t=turns[idx]; document.getElementById('conversation').innerHTML=`<div class="bubble">${t.system}</div><div class="bubble patient">${t.patient}</div>`; document.getElementById('stateLine').textContent=`Patient state: ${t.state}`; document.getElementById('turnLine').textContent=`Turn ${idx+1} of ${turns.length} · Session active`; }
+function renderTimeline(){ document.getElementById('timeline').innerHTML=timeline.map(x=>`<li>${x}</li>`).join(''); }
+function update(silent=false){ const risk=+val('risk'), owner=val('owner'), clinician=val('clinician'), ops=val('ops'), action=val('action'), policy=val('policy'); document.getElementById('riskLabel').textContent=risk; const g=gate(action,policy,risk); const auth=authority(risk,owner,clinician,ops); const dec=decisionFor(g,auth,risk,owner,clinician,ops); const j=justification(auth,dec);
+ if(!silent && auth!==lastAuthority) log(`Authority State → ${auth}`); if(!silent && dec!==lastDecision) log(`Decision → ${dec}`); lastAuthority=auth; lastDecision=dec;
+ const dot=document.getElementById('ragDot'); dot.className='dot '+(risk>=85?'red':risk>=70?'orange':risk>=50?'':''); if(risk<50) dot.className='dot';
+ const d=document.getElementById('decision'); d.textContent=dec; d.className='decision '+(dec==='ALLOW'?'allow':dec==='ESCALATE'?'escalate':'refuse'); document.getElementById('decisionNode').textContent=dec; document.getElementById('decisionText').textContent= dec==='ALLOW'?'Authority, oversight and operational context are sufficient for monitored continuation.':dec==='ESCALATE'?'Risk trajectory and authority state require human escalation before consequence can safely form.':'Runtime conditions no longer justify the proposed consequence. Action is refused or suppressed.';
+ document.getElementById('gateStatus').textContent=g.ok?'APPROVED':'BLOCKED'; document.getElementById('gateStatus').className='pill '+(g.ok?'yes':'no'); document.getElementById('gateRow').className='row '+(g.ok?'gateApproved':'gateBlocked'); document.getElementById('gateReason').textContent=g.reason; document.getElementById('gateNodeText').textContent=g.ok?'APPROVED':'BLOCKED';
+ ['Normal','Conditional','Escalated','Restricted'].forEach(n=>document.getElementById('a'+n).classList.remove('active')); document.getElementById('a'+auth.charAt(0)+auth.slice(1).toLowerCase()).classList.add('active');
+ setJ('jMonitor',j.monitor,'Monitoring'); setJ('jEscalate',j.escalation,'Escalation'); setJ('jAuto',j.auto,'Autonomous continuation');
+ const ev=[['Policy gate approved?',g.ok],['Authority state',auth],['Risk threshold crossed?',risk>=70],['Escalation owner available?',owner==='available'],['Human oversight available?',clinician==='available'],['Operational context valid?',ops==='valid']]; document.getElementById('evidence').innerHTML=ev.map(([k,v])=>`<div class="row"><span>${k}</span><span class="pill ${typeof v==='boolean'?(v?'yes':'no'):'neutral'}">${typeof v==='boolean'?(v?'YES':'NO'):v}</span></div>`).join('');
+ const why=[]; if(g.ok) why.push('Lumara clinical gate has approved the proposed action under current policy conditions.'); else why.push(g.reason); why.push(`Authority state is ${auth}.`); if(risk>=70) why.push('Risk threshold has crossed into escalation territory.'); else why.push('Risk has not crossed the escalation threshold.'); if(owner==='missing') why.push('Escalation owner is unavailable.'); if(clinician==='missing') why.push('Human oversight is unavailable.'); if(ops==='invalid') why.push('Operational context is invalid.'); if(dec==='ALLOW') why.push('Institution remains justified in allowing monitored continuation.'); if(dec==='ESCALATE') why.push('Institution remains justified in escalation, but not autonomous continuation.'); if(dec==='REFUSE') why.push('Institution is not justified in allowing this consequence to form under current runtime conditions.'); document.getElementById('why').innerHTML=why.map(w=>`<li>${w}</li>`).join('');
+ const receipt={timestamp:new Date().toISOString(), flowsignal_demo:'clinical_admissibility_v3', scenario:'deteriorating_mental_health_session', current_turn:idx+1, proposed_action:action, policy_gate:g.ok?'APPROVED':'BLOCKED', policy_reason:g.reason, patient_state:turns[idx].state, risk_score:risk, authority_state:auth, escalation_owner:owner==='available'?'AVAILABLE':'UNAVAILABLE', human_oversight:clinician==='available'?'AVAILABLE':'UNAVAILABLE', operational_context:ops==='valid'?'VALID':'INVALID', institutional_justification:j.auto?'MONITORING_AND_AUTONOMOUS_CONTINUATION':j.escalation?'ESCALATION_ONLY':'MONITORING_ONLY', decision:dec};
+ document.getElementById('receiptRows').innerHTML=Object.entries({Timestamp:receipt.timestamp, 'Policy Gate':receipt.policy_gate, 'Authority State':auth, Risk:risk+'/100', 'Institutional Justification':receipt.institutional_justification, Decision:dec}).map(([k,v])=>`<div class="kpi"><span class="muted">${k}</span><b>${v}</b></div>`).join(''); document.getElementById('payload').textContent=JSON.stringify(receipt,null,2);
+}
+function setJ(id,ok,label){ const e=document.getElementById(id); e.className='jitem '+(ok?'ok':'bad'); e.textContent=(ok?'✓ ':'✗ ')+label; }
+function advance(){ if(idx<turns.length-1){idx++; applyTurn();} }
+function back(){ if(idx>0){idx--; applyTurn();} }
+function manualRisk(v){ log(`Risk manually changed → ${v}`); update(); }
+function resetDemo(){ idx=0; timeline=[]; setVal('owner','available'); setVal('clinician','available'); setVal('ops','valid'); applyTurn(); }
+resetDemo();
+</script>
 </body>
 </html>
