@@ -176,6 +176,27 @@ function advance(){ if(idx<turns.length-1){idx++; applyTurn();} }
 function back(){ if(idx>0){idx--; applyTurn();} }
 function manualRisk(v){ log(`Risk manually changed → ${v}`); update(); }
 function resetDemo(){ idx=0; timeline=[]; setVal('owner','available'); setVal('clinician','available'); setVal('ops','valid'); applyTurn(); }
+function loadGateRecord(event) {
+
+    const file = event.target.files[0];
+
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+
+        const json = JSON.parse(e.target.result);
+
+        console.log(json);
+
+        alert("Gate Record Loaded Successfully");
+
+    };
+
+    reader.readAsText(file);
+
+}
 resetDemo();
 </script>
 </body>
