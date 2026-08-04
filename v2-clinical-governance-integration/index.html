@@ -1,1 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlowSignal™ Runtime Authority Integration Demonstrator</title>
+  <style>
+    :root {
+      --bg: #071318; --panel: #0d2028; --panel2: #102a34; --line: rgba(255,255,255,.14);
+      --text: #e9fbff; --muted: #9cc3cc; --accent: #2be4d0; --blue:#54a7ff;
+      --green:#54e38e; --amber:#f6b93b; --orange:#ff9f43; --red:#ff5b6e; --bad:#ff5b6e;
+      --shadow: 0 18px 55px rgba(0,0,0,.35); --radius: 18px;
+    }
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(circle at top left,rgba(43,228,208,.16),transparent 32%),radial-gradient(circle at bottom right,rgba(84,167,255,.12),transparent 35%),var(--bg);color:var(--text);}
+    header{display:flex;gap:18px;align-items:center;padding:30px clamp(18px,4vw,58px) 22px;border-bottom:1px solid var(--line);background:rgba(7,19,24,.8);position:sticky;top:0;z-index:3;backdrop-filter: blur(8px)}
+    .logo{width:40px;height:40px;border-radius:50%;border:8px solid #38d9f7;position:relative;box-shadow:0 0 24px rgba(43,228,208,.35)} .logo:after{content:"";position:absolute;width:8px;height:34px;background:#071318;transform:rotate(42deg);left:8px;top:-5px;border-radius:8px}
+    h1{margin:0;font-size:clamp(30px,4vw,54px);line-height:1}.sub{margin:10px 0 0;color:var(--muted);max-width:1100px;font-size:16px}.wrap{padding:26px clamp(14px,3vw,38px);display:grid;grid-template-columns:1.08fr .95fr .9fr;gap:18px;align-items:start}
+    .card{background:linear-gradient(180deg,rgba(16,42,52,.96),rgba(8,27,34,.96));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}.card h2{font-size:22px;margin:0 0 14px}.card h3{font-size:15px;margin:16px 0 9px;color:#dffcff}.muted{color:var(--muted);font-size:13px}.status{display:flex;align-items:center;gap:12px;padding:16px;border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:13px;margin-bottom:14px}.dot{width:16px;height:16px;border-radius:50%;background:var(--amber);box-shadow:0 0 14px rgba(246,185,59,.55)}.dot.green{background:var(--green)}.dot.orange{background:var(--orange)}.dot.red{background:var(--red)}
+    .conversation{min-height:235px;border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.15);padding:16px;display:flex;flex-direction:column;gap:14px}.bubble{max-width:72%;padding:12px 14px;border-radius:14px;border:1px solid rgba(43,228,208,.35);background:rgba(43,228,208,.10);font-weight:700}.bubble.patient{margin-left:auto;background:rgba(255,255,255,.07);border-color:var(--line)}
+    .controls{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}button{border:1px solid rgba(43,228,208,.28);background:linear-gradient(135deg,rgba(43,228,208,.28),rgba(84,167,255,.25));color:var(--text);font-weight:800;border-radius:10px;padding:13px;cursor:pointer}button:hover{filter:brightness(1.12)}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:13px;padding:13px}label{display:block;color:#8edbe6;font-size:13px;margin-bottom:8px}select,input[type=range]{width:100%}select{padding:12px;border-radius:10px;background:#061217;color:white;border:1px solid var(--line);font-weight:800}.decisionBox{text-align:center;border:1px solid var(--line);border-radius:15px;padding:22px;background:rgba(255,255,255,.05)}.eyebrow{letter-spacing:.24em;text-transform:uppercase;color:#8edbe6;font-size:11px}.decision{font-size:62px;font-weight:950;line-height:1;margin:10px 0}.allow{color:var(--green)}.escalate{color:var(--amber)}.refuse{color:var(--red)}
+    .row{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:10px;padding:10px 12px;margin:7px 0;font-weight:800}.pill{font-size:12px;border-radius:999px;padding:5px 10px;font-weight:950}.yes{background:var(--green);color:#04210d}.no{background:var(--bad);color:#26020a}.neutral{background:#173845;color:#cef9ff;border:1px solid var(--line)}.gateApproved{background:rgba(84,227,142,.12);border-color:rgba(84,227,142,.45)}.gateBlocked{background:rgba(255,91,110,.12);border-color:rgba(255,91,110,.45)}
+    .pipeline{display:flex;flex-direction:column;gap:8px}.node{border:1px solid var(--line);background:rgba(255,255,255,.045);border-radius:10px;padding:11px;text-align:center;font-weight:900}.node.live{border-color:rgba(43,228,208,.85);box-shadow:0 0 18px rgba(43,228,208,.15)}.arrow{text-align:center;color:#80eefa;font-weight:900}.authority{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.authbox{border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center;font-weight:950;font-size:12px;opacity:.45}.authbox.active{opacity:1;transform:translateY(-1px);box-shadow:0 0 16px rgba(255,255,255,.08)}.normal.active{border-color:var(--green);color:var(--green)}.conditional.active{border-color:var(--amber);color:var(--amber)}.escalated.active{border-color:var(--orange);color:var(--orange)}.restricted.active{border-color:var(--red);color:var(--red)}
+    .justify{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.jitem{border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center;font-weight:900}.ok{color:var(--green)}.bad{color:var(--red)}.why li,.timeline li{margin:7px 0}.why{padding-left:20px}.timeline{max-height:235px;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:10px 10px 10px 28px;background:rgba(0,0,0,.12);font-size:13px}.receipt{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;white-space:pre-wrap;background:#050e12;border:1px solid var(--line);border-radius:12px;padding:14px;max-height:310px;overflow:auto}.smallgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.kpi{border:1px solid var(--line);border-radius:10px;padding:10px;background:rgba(255,255,255,.04)}.kpi b{display:block;margin-top:4px}.footerNote{padding:0 clamp(14px,3vw,38px) 22px;color:var(--muted);font-size:12px}
+    @media(max-width:1250px){.wrap{grid-template-columns:1fr 1fr}.wide{grid-column:1/-1}} @media(max-width:850px){.wrap{grid-template-columns:1fr}.formgrid,.smallgrid,.justify,.authority{grid-template-columns:1fr}.decision{font-size:48px}.bubble{max-width:95%}header{align-items:flex-start}}
+  </style>
+</head>
+<body>
+<header><div class="logo"></div><div><h1>FlowSignal™ Runtime Authority Integration Demonstrator</h1><p class="sub">Demonstrating how an independent Runtime Authority interoperates with external clinical governance systems through an Execution Bind Point. Clinical governance establishes policy compliance; FlowSignal independently determines whether delegated authority remains legitimately exercisable immediately before consequence formation.</p></div></header>
+<main class="wrap">
+  <section class="card">
+    <h2>Live Clinical Session</h2>
+    <div class="status"><span id="ragDot" class="dot"></span><div><b id="stateLine">Patient state: AMBER</b><br><span class="muted" id="turnLine">Turn 1 of 6 · Session active</span></div></div>
+    <div class="conversation" id="conversation"></div>
+    <div class="controls"><button onclick="back()">Back</button><button onclick="advance()">Advance Conversation</button><button onclick="resetDemo()">Reset</button></div>
+    <div class="formgrid">
+      <div class="field"><label>Risk intensity: <b id="riskLabel">35</b>/100</label><input id="risk" type="range" min="0" max="100" value="35" oninput="manualRisk(this.value)"></div>
+      <div class="field"><label>Proposed clinical action</label><select id="action" onchange="update()"><option value="exercise_offer">Exercise offer</option><option value="wrap_up_delivery">Session wrap-up</option><option value="assertive_intervention">Assertive intervention</option></select></div>
+      <div class="field"><label>Policy condition</label><select id="policy" onchange="update()"><option value="valid">Policy valid</option><option value="blocked">Policy blocked</option></select></div>
+      <div class="field"><label>Escalation owner</label><select id="owner" onchange="update()"><option value="available">Available</option><option value="missing">Unavailable</option></select></div>
+      <div class="field"><label>Human oversight</label><select id="clinician" onchange="update()"><option value="available">Clinician available</option><option value="missing">Clinician unavailable</option></select></div>
+      <div class="field"><label>Operational context</label><select id="ops" onchange="update()"><option value="valid">Operational context valid</option><option value="invalid">Operational context invalid</option></select></div>
+    </div>
+  </section>
 
+  <section class="card">
+    <h2>Runtime Integration Pipeline</h2>
+<div class="field" style="margin-bottom:16px;">
+<label>Clinical Governance Provider</label>
+<select id="provider">
+<option selected>Mental Health Chat</option>
+<option>Generic Clinical Gate</option>
+<option>NHS Ambient Scribing</option>
+<option>FlowSignal Test Harness</option>
+</select>
+</div>
+
+    <div class="pipeline">
+      <div class="node">Mental Health Session</div><div class="arrow">↓</div>
+      <div class="node">Clinical AI Recommendation</div><div class="arrow">↓</div>
+      <div class="node" id="gateNode">Clinical Governance Gate<br><span id="gateNodeText" class="muted">APPROVED / BLOCKED</span></div><div class="arrow">↓</div>
+      <div class="node">Gate Decision Record</div><div class="arrow">↓</div><div class="node live">Execution Bind Point (Institutional Authority Check)</div><div class="arrow">↓</div>
+      <div class="node live">FlowSignal™ Independant Runtime Authority</div><div class="arrow">↓</div>
+      <div class="node" id="decisionNode">ALLOW / ESCALATE / REFUSE</div><div class="arrow">↓</div>
+      <div class="node">Consequential Clinical Action or Human Escalation</div>
+    </div>
+    <h3>Clinical Governance Gate</h3><div class="row" id="gateRow"><span>Policy gate status</span><span class="pill yes" id="gateStatus">APPROVED</span></div>
+    <p class="muted" id="gateReason">Clinical policy conditions are currently satisfied for the proposed action.</p>
+    
+<h3>Imported Gate Decision</h3>
+<div class="smallgrid">
+<div class="kpi"><span class="muted">Provider</span><b>Mental Health Chat</b></div>
+<div class="kpi"><span class="muted">Gate Version</span><b>1.0.0</b></div>
+<div class="kpi"><span class="muted">Policy</span><b>lumara_clinical_policy_v1.2</b></div>
+<div class="kpi"><span class="muted">Integrity</span><b>Verified ✓</b></div>
+</div>
+<h3>Runtime Authority State</h3><div class="authority"><div id="aNormal" class="authbox normal">NORMAL</div><div id="aConditional" class="authbox conditional">CONDITIONAL</div><div id="aEscalated" class="authbox escalated">ESCALATED</div><div id="aRestricted" class="authbox restricted">RESTRICTED</div></div>
+    <h3>Institutional Justification</h3><div class="justify"><div class="jitem" id="jMonitor">✓ Monitoring</div><div class="jitem" id="jEscalate">✓ Escalation</div><div class="jitem" id="jAuto">✓ Autonomous continuation</div></div>
+  </section>
+
+  <section class="card">
+    <h2>Runtime Decision</h2>
+    <div class="decisionBox"><div class="eyebrow">Admissibility Decision</div><div id="decision" class="decision allow">ALLOW</div><p id="decisionText" class="muted">Authority, oversight and operational context are sufficient for monitored continuation.</p></div>
+    <h3>Layer Comparison</h3>
+    <div class="row"><span>Clinical Governance Gate</span><span class="pill yes" id="compareGate">APPROVED</span></div>
+    <div class="row"><span>FlowSignal™ Independant Runtime Authority</span><span class="pill neutral" id="compareFlow">ALLOW</span></div>
+    <h3>Imported Evidence</h3><div id="evidence"></div>
+    <h3>Why?</h3><ul class="why" id="why"></ul>
+  </section>
+
+  <section class="card wide">
+    <h2>Decision Timeline</h2><p class="muted">Runtime sequence showing when the authority state and admissibility decision changed.</p><ol class="timeline" id="timeline"></ol>
+  </section>
+
+  <section class="card wide">
+    <h2>Authority Receipt</h2><p class="muted">Board/audit-facing snapshot of why the runtime decision was defensible at the point of consequence formation.</p><div class="smallgrid" id="receiptRows"></div><h3>Evidence Payload</h3><div class="receipt" id="payload"></div>
+  </section>
+</main>
+<div class="footerNote">This demonstrator illustrates architectural interoperability between a clinical governance platform and FlowSignal Runtime Authority. Clinical governance determines policy compliance; FlowSignal independently determines whether institutional authority remains exercisable immediately before consequence formation.</div>
+<script>
+const turns=[
+ {state:'AMBER',risk:35,action:'exercise_offer',policy:'valid',patient:'I’m struggling today, but I don’t want to make a big deal of it.',system:'The session begins with the patient presenting at AMBER distress. Support option offered: guided grounding exercise and clinician follow-up if needed.',event:'Session started · AMBER distress · exercise offered'},
+ {state:'AMBER',risk:48,action:'exercise_offer',policy:'valid',patient:'No, I don’t want the exercise. It won’t help anyway.',system:'Patient declines the first support offer. FlowSignal continues monitored admissibility evaluation.',event:'Support declined once · risk rising'},
+ {state:'AMBER',risk:58,action:'exercise_offer',policy:'valid',patient:'Please stop asking. I said I don’t want help.',system:'Second support offer is declined. Authority becomes conditional as refusal pattern and distress trajectory increase.',event:'Support declined twice · authority becoming conditional'},
+ {state:'RED trajectory',risk:72,action:'assertive_intervention',policy:'valid',patient:'Everything is closing in. I don’t know how much longer I can do this.',system:'Language intensity worsens. Risk threshold crossed. Escalation readiness is now required before consequence can form.',event:'Risk threshold crossed · escalation readiness required'},
+ {state:'RED trajectory',risk:84,action:'assertive_intervention',policy:'valid',patient:'I’m not safe with myself right now.',system:'Assertive clinical escalation is proposed. FlowSignal checks policy gate result, escalation owner, clinician availability and operational feasibility.',event:'Assertive intervention proposed · admissibility check intensified'},
+ {state:'RED',risk:91,action:'assertive_intervention',policy:'valid',patient:'I need someone now.',system:'RED state. FlowSignal restricts autonomous continuation and requires available clinical escalation pathway.',event:'RED state reached · autonomous continuation restricted'}
+];
+let idx=0; let timeline=[]; let lastAuthority=''; let lastDecision='';
+function now(){return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});} function log(msg){timeline.push(`${now()}  ${msg}`); renderTimeline();}
+function val(id){return document.getElementById(id).value}
+function setVal(id,v){document.getElementById(id).value=v}
+function authority(risk,owner,clinician,ops){ if(owner==='missing'||clinician==='missing'||ops==='invalid'||risk>=85) return 'RESTRICTED'; if(risk>=70) return 'ESCALATED'; if(risk>=50) return 'CONDITIONAL'; return 'NORMAL'; }
+function gate(action,policy,risk){ if(policy==='blocked') return {ok:false, reason:'Clinical policy condition has explicitly blocked the proposed action.'}; if(action==='exercise_offer' && risk>=70) return {ok:false, reason:'Exercise offer blocked because crisis trajectory is active.'}; if(action==='wrap_up_delivery' && risk>=70) return {ok:false, reason:'Standard wrap-up blocked because the session is in crisis trajectory.'}; return {ok:true, reason:'Clinical policy conditions are currently satisfied for the proposed action.'}; }
+function decisionFor(g,auth,risk,owner,clinician,ops){ if(!g.ok) return 'REFUSE'; if(auth==='RESTRICTED') return 'REFUSE'; if(risk>=70) return 'ESCALATE'; if(risk>=50) return 'ESCALATE'; return 'ALLOW'; }
+function justification(auth,decision){ const monitor=true; const escalation=(auth!=='RESTRICTED' || decision==='ESCALATE'); const auto=(auth==='NORMAL'||auth==='CONDITIONAL') && decision==='ALLOW'; return {monitor,escalation,auto}; }
+function applyTurn(){ const t=turns[idx]; setVal('risk',t.risk); setVal('action',t.action); setVal('policy',t.policy); renderConversation(); log(t.event); update(true); }
+function renderConversation(){ const t=turns[idx]; document.getElementById('conversation').innerHTML=`<div class="bubble">${t.system}</div><div class="bubble patient">${t.patient}</div>`; document.getElementById('stateLine').textContent=`Patient state: ${t.state}`; document.getElementById('turnLine').textContent=`Turn ${idx+1} of ${turns.length} · Session active`; }
+function renderTimeline(){ document.getElementById('timeline').innerHTML=timeline.map(x=>`<li>${x}</li>`).join(''); }
+function update(silent=false){ const risk=+val('risk'), owner=val('owner'), clinician=val('clinician'), ops=val('ops'), action=val('action'), policy=val('policy'); document.getElementById('riskLabel').textContent=risk; const g=gate(action,policy,risk); const auth=authority(risk,owner,clinician,ops); const dec=decisionFor(g,auth,risk,owner,clinician,ops); const j=justification(auth,dec);
+ if(!silent && auth!==lastAuthority) log(`Authority State → ${auth}`);
+ if(!silent && dec!==lastDecision) log(`Admissibility Decision → ${dec}`);
+ if(!silent && clinician==='missing') log('Human Oversight → UNAVAILABLE');
+ if(!silent && owner==='missing') log('Escalation Owner → UNAVAILABLE');
+ if(!silent && ops==='invalid') log('Operational Context → INVALID');
+ lastAuthority=auth; lastDecision=dec;
+ const dot=document.getElementById('ragDot'); dot.className='dot '+(risk>=85?'red':risk>=70?'orange':risk>=50?'':''); if(risk<50) dot.className='dot';
+ const d=document.getElementById('decision'); d.textContent=dec; d.className='decision '+(dec==='ALLOW'?'allow':dec==='ESCALATE'?'escalate':'refuse'); document.getElementById('decisionNode').textContent=dec; document.getElementById('decisionText').textContent= dec==='ALLOW'?'Authority, oversight and operational context are sufficient for monitored continuation.':dec==='ESCALATE'?'Risk trajectory and authority state require human escalation before consequence can safely form.':'Runtime conditions no longer justify the proposed consequence. Action is refused or suppressed.';
+ document.getElementById('gateStatus').textContent=g.ok?'APPROVED':'BLOCKED'; document.getElementById('gateStatus').className='pill '+(g.ok?'yes':'no'); document.getElementById('gateRow').className='row '+(g.ok?'gateApproved':'gateBlocked'); document.getElementById('gateReason').textContent=g.reason; document.getElementById('gateNodeText').textContent=g.ok?'APPROVED':'BLOCKED';
+ document.getElementById('compareGate').textContent=g.ok?'APPROVED':'BLOCKED';
+ document.getElementById('compareGate').className='pill '+(g.ok?'yes':'no');
+ document.getElementById('compareFlow').textContent=dec;
+ document.getElementById('compareFlow').className='pill '+(dec==='ALLOW'?'yes':dec==='ESCALATE'?'neutral':'no');
+ ['Normal','Conditional','Escalated','Restricted'].forEach(n=>document.getElementById('a'+n).classList.remove('active')); document.getElementById('a'+auth.charAt(0)+auth.slice(1).toLowerCase()).classList.add('active');
+ setJ('jMonitor',j.monitor,'Monitoring'); setJ('jEscalate',j.escalation,'Escalation'); setJ('jAuto',j.auto,'Autonomous continuation');
+ const ev=[['Policy gate approved?',g.ok],['Authority state',auth],['Clinical risk trigger active?',risk>=70],['Escalation owner available?',owner==='available'],['Human oversight available?',clinician==='available'],['Operational context valid?',ops==='valid']]; document.getElementById('evidence').innerHTML=ev.map(([k,v])=>`<div class="row"><span>${k}</span><span class="pill ${typeof v==='boolean'?(v?'yes':'no'):'neutral'}">${typeof v==='boolean'?(v?'YES':'NO'):v}</span></div>`).join('');
+ const why=[]; if(g.ok) why.push('Lumara clinical gate has approved the proposed action under current policy conditions.'); else why.push(g.reason); why.push(`Authority state is ${auth}.`); if(risk>=70) why.push('Clinical risk trigger is active and escalation readiness must be considered.'); else why.push('Clinical risk trigger is not active; any refusal is driven by authority, oversight or operational context.'); if(owner==='missing') why.push('Escalation owner is unavailable.'); if(clinician==='missing') why.push('Human oversight is unavailable.'); if(ops==='invalid') why.push('Operational context is invalid.'); if(dec==='ALLOW') why.push('Institution remains justified in allowing monitored continuation.'); if(dec==='ESCALATE') why.push('Institution remains justified in escalation, but not autonomous continuation.'); if(dec==='REFUSE') why.push('Institution is not justified in allowing this consequence to form under current runtime conditions.'); document.getElementById('why').innerHTML=why.map(w=>`<li>${w}</li>`).join('');
+ const admReason = dec==='ALLOW'
+  ? 'Authority, oversight and operational context are sufficient for monitored continuation.'
+  : dec==='ESCALATE'
+    ? 'Runtime authority conditions require human escalation before consequence formation.'
+    : (!g.ok
+      ? 'Policy gate blocked the proposed action. FlowSignal refuses consequence formation.'
+      : auth==='RESTRICTED'
+        ? 'Authority state restricted. Human oversight, escalation ownership or operational context is insufficient to justify consequence formation.'
+        : 'Institution is not justified in allowing this consequence to form under current runtime conditions.');
+ const receipt={timestamp:new Date().toISOString(), flowsignal_demo:'clinical_admissibility_v5', scenario:'deteriorating_mental_health_session', current_turn:idx+1, proposed_action:action, policy_gate:g.ok?'APPROVED':'BLOCKED', policy_reason:g.reason, patient_state:turns[idx].state, risk_score:risk, clinical_risk_trigger_active:risk>=70, authority_state:auth, escalation_owner:owner==='available'?'AVAILABLE':'UNAVAILABLE', human_oversight:clinician==='available'?'AVAILABLE':'UNAVAILABLE', operational_context:ops==='valid'?'VALID':'INVALID', institutional_justification:{monitoring:j.monitor, escalation:j.escalation, autonomous_continuation:j.auto}, admissibility_reason:admReason, decision:dec};
+ document.getElementById('receiptRows').innerHTML=Object.entries({Timestamp:receipt.timestamp, 'Policy Gate':receipt.policy_gate, 'Authority State':auth, Risk:risk+'/100', 'Institutional Justification': j.auto?'MONITORING_AND_AUTONOMOUS_CONTINUATION':j.escalation?'ESCALATION_ONLY':'MONITORING_ONLY', Decision:dec}).map(([k,v])=>`<div class="kpi"><span class="muted">${k}</span><b>${v}</b></div>`).join(''); document.getElementById('payload').textContent=JSON.stringify(receipt,null,2);
+}
+function setJ(id,ok,label){ const e=document.getElementById(id); e.className='jitem '+(ok?'ok':'bad'); e.textContent=(ok?'✓ ':'✗ ')+label; }
+function advance(){ if(idx<turns.length-1){idx++; applyTurn();} }
+function back(){ if(idx>0){idx--; applyTurn();} }
+function manualRisk(v){ log(`Risk manually changed → ${v}`); update(); }
+function resetDemo(){ idx=0; timeline=[]; setVal('owner','available'); setVal('clinician','available'); setVal('ops','valid'); applyTurn(); }
+resetDemo();
+</script>
+</body>
+</html>
