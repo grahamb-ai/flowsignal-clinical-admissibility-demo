@@ -206,6 +206,22 @@ function loadGateRecord(event) {
 
     const metadata = json.export_metadata;
     const record = json.records[0];
+    const selector = document.getElementById("recordSelector");
+
+// Remove any existing options
+selector.innerHTML = "";
+
+// Add one option for each imported record
+json.records.forEach((record, index) => {
+
+    const option = document.createElement("option");
+
+    option.value = index;
+    option.textContent = `Record ${index + 1}`;
+
+    selector.appendChild(option);
+
+});
     document.getElementById("recordCount").textContent =
     json.records.length;
 
