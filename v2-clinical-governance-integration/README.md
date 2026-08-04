@@ -103,3 +103,6 @@ Runtime Authority Mapping
 Phase 4
 
 Live Authority Determination
+
+
+Current demonstration provider: Mental Health Chat (synthetic gate records and technical brief supplied for architectural interoperability evaluation). The demonstrator illustrates the integration pattern and does not represent a production deployment.
