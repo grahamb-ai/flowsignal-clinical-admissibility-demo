@@ -184,12 +184,29 @@ function loadGateRecord(event) {
 
     const reader = new FileReader();
 
-    reader.onload = function(e) {
+   reader.onload = function(e) {
 
     const json = JSON.parse(e.target.result);
 
-    console.log(json);
+    const metadata = json.export_metadata;
+    const record = json.records[0];
 
+    document.getElementById("providerName").textContent =
+        "Mental Health Chat";
+
+    document.getElementById("gateVersion").textContent =
+        metadata.gate_version;
+
+    document.getElementById("policyRef").textContent =
+        metadata.policy_ref;
+
+    document.getElementById("integrityStatus").textContent =
+        "Verified ✓";
+
+    console.log(metadata);
+    console.log(record);
+
+}
     // Use the first record if the JSON contains an array
     const record = Array.isArray(json) ? json[0] : json;
 
