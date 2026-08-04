@@ -85,10 +85,13 @@
         <b id="recordCount">0</b>
     </div>
 
-    <div class="kpi">
-        <span class="muted">Selected Record</span>
-        <b id="selectedRecord">1</b>
-    </div>
+   <div class="kpi">
+    <span class="muted">Selected Record</span>
+
+    <select id="recordSelector" style="width:100%;" onchange="changeRecord()">
+        <option value="0">Record 1</option>
+    </select>
+
 
 </div> 
 <h3>Imported Gate Decision</h3>
