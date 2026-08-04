@@ -146,7 +146,10 @@ const turns=[
  {state:'RED trajectory',risk:84,action:'assertive_intervention',policy:'valid',patient:'I’m not safe with myself right now.',system:'Assertive clinical escalation is proposed. FlowSignal checks policy gate result, escalation owner, clinician availability and operational feasibility.',event:'Assertive intervention proposed · admissibility check intensified'},
  {state:'RED',risk:91,action:'assertive_intervention',policy:'valid',patient:'I need someone now.',system:'RED state. FlowSignal restricts autonomous continuation and requires available clinical escalation pathway.',event:'RED state reached · autonomous continuation restricted'}
 ];
-let idx=0; let timeline=[]; let lastAuthority=''; let lastDecision='';
+let idx=0;
+let timeline=[];
+let lastAuthority='';
+let lastDecision='';
 function now(){return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});} function log(msg){timeline.push(`${now()}  ${msg}`); renderTimeline();}
 function val(id){return document.getElementById(id).value}
 function setVal(id,v){document.getElementById(id).value=v}
@@ -203,7 +206,7 @@ function loadGateRecord(event) {
    reader.onload = function(e) {
 
     const json = JSON.parse(e.target.result);
-
+gateExport = json;
     const metadata = json.export_metadata;
     const record = json.records[0];
     const selector = document.getElementById("recordSelector");
