@@ -43,7 +43,7 @@
   </section>
 
   <section class="card">
-    <h2>Runtime Integration Pipeline</h2>
+    <h2>Clinical Governance → Runtime Authority Integration</h2>
 <div class="field" style="margin-bottom:16px;">
 <label>Clinical Governance Provider</label>
 <select id="provider">
@@ -57,13 +57,13 @@
     <div class="pipeline">
       <div class="node">Mental Health Session</div><div class="arrow">↓</div>
       <div class="node">Clinical AI Recommendation</div><div class="arrow">↓</div>
-      <div class="node" id="gateNode">Clinical Governance Gate<br><span id="gateNodeText" class="muted">APPROVED / BLOCKED</span></div><div class="arrow">↓</div>
-      <div class="node">Gate Decision Record</div><div class="arrow">↓</div><div class="node live">Execution Bind Point (Institutional Authority Check)</div><div class="arrow">↓</div>
+      <div class="node" id="gateNode">Mental Health Chat Clinical Governance<br><span id="gateNodeText" class="muted">APPROVED / BLOCKED</span></div><div class="arrow">↓</div>
+      <div class="node">Signed Gate Decision Export</div><div class="arrow">↓</div><div class="node live">Execution Bind Point (Institutional Authority Check)</div><div class="arrow">↓</div>
       <div class="node live">FlowSignal™ Independant Runtime Authority</div><div class="arrow">↓</div>
       <div class="node" id="decisionNode">ALLOW / ESCALATE / REFUSE</div><div class="arrow">↓</div>
       <div class="node">Consequential Clinical Action or Human Escalation</div>
     </div>
-    <h3>Clinical Governance Gate</h3><div class="row" id="gateRow"><span>Policy gate status</span><span class="pill yes" id="gateStatus">APPROVED</span></div>
+    <h3>Mental Health Chat Clinical Governance</h3><div class="row" id="gateRow"><span>Policy gate status</span><span class="pill yes" id="gateStatus">APPROVED</span></div>
     <p class="muted" id="gateReason">Clinical policy conditions are currently satisfied for the proposed action.</p>
     
 <div style="margin-bottom:15px;">
@@ -122,7 +122,7 @@
     <h2>Runtime Decision</h2>
     <div class="decisionBox"><div class="eyebrow">Admissibility Decision</div><div id="decision" class="decision allow">ALLOW</div><p id="decisionText" class="muted">Authority, oversight and operational context are sufficient for monitored continuation.</p></div>
     <h3>Layer Comparison</h3>
-    <div class="row"><span>Clinical Governance Gate</span><span class="pill yes" id="compareGate">APPROVED</span></div>
+    <div class="row"><span>Mental Health Chat Clinical Governance</span><span class="pill yes" id="compareGate">APPROVED</span></div>
     <div class="row"><span>FlowSignal™ Independant Runtime Authority</span><span class="pill neutral" id="compareFlow">ALLOW</span></div>
     <h3>Imported Evidence</h3><div id="evidence"></div>
     <h3>Why?</h3><ul class="why" id="why"></ul>
