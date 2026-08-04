@@ -3,7 +3,7 @@ Purpose
 
 This demonstrator illustrates how an external Clinical Governance system can interoperate with an independent Runtime Authority through an Execution Bind Point.
 
-The demonstrator shows that governance and Runtime Authority answer different questions.
+The demonstrator shows that governance and Runtime Authority answer different questions..
 
 Clinical Governance
 
