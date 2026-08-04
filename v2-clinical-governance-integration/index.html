@@ -66,6 +66,18 @@
     <h3>Clinical Governance Gate</h3><div class="row" id="gateRow"><span>Policy gate status</span><span class="pill yes" id="gateStatus">APPROVED</span></div>
     <p class="muted" id="gateReason">Clinical policy conditions are currently satisfied for the proposed action.</p>
     
+<div style="margin-bottom:15px;">
+    <button onclick="document.getElementById('gateFile').click()">
+        📂 Import Gate Record
+    </button>
+
+    <input
+        type="file"
+        id="gateFile"
+        accept=".json"
+        style="display:none"
+        onchange="loadGateRecord(event)">
+</div>
 <h3>Imported Gate Decision</h3>
 <div class="smallgrid">
 <div class="kpi"><span class="muted">Provider</span><b>Mental Health Chat</b></div>
