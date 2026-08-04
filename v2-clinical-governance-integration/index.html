@@ -79,11 +79,24 @@
         onchange="loadGateRecord(event)">
 </div>
 <h3>Imported Gate Decision</h3>
-<div class="smallgrid">
-<div class="kpi"><span class="muted">Provider</span><b>Mental Health Chat</b></div>
-<div class="kpi"><span class="muted">Gate Version</span><b>1.0.0</b></div>
-<div class="kpi"><span class="muted">Policy</span><b>lumara_clinical_policy_v1.2</b></div>
-<div class="kpi"><span class="muted">Integrity</span><b>Verified ✓</b></div>
+<div class="kpi">
+    <span class="muted">Provider</span>
+    <b id="providerName">Not Loaded</b>
+</div>
+
+<div class="kpi">
+    <span class="muted">Gate Version</span>
+    <b id="gateVersion">-</b>
+</div>
+
+<div class="kpi">
+    <span class="muted">Policy</span>
+    <b id="policyRef">-</b>
+</div>
+
+<div class="kpi">
+    <span class="muted">Integrity</span>
+    <b id="integrityStatus">Unknown</b>
 </div>
 <h3>Runtime Authority State</h3><div class="authority"><div id="aNormal" class="authbox normal">NORMAL</div><div id="aConditional" class="authbox conditional">CONDITIONAL</div><div id="aEscalated" class="authbox escalated">ESCALATED</div><div id="aRestricted" class="authbox restricted">RESTRICTED</div></div>
     <h3>Institutional Justification</h3><div class="justify"><div class="jitem" id="jMonitor">✓ Monitoring</div><div class="jitem" id="jEscalate">✓ Escalation</div><div class="jitem" id="jAuto">✓ Autonomous continuation</div></div>
