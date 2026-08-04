@@ -252,6 +252,15 @@ document.getElementById("selectedRecord").textContent =
     reader.readAsText(file);
 
 }
+function changeRecord() {
+
+    if (!gateExport) return;
+
+    const index = Number(document.getElementById("recordSelector").value);
+
+    console.log("Selected:", index);
+
+}
 resetDemo();
 </script>
 </body>
