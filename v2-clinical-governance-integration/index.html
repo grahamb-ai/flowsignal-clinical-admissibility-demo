@@ -78,6 +78,19 @@
         style="display:none"
         onchange="loadGateRecord(event)">
 </div>
+<div class="smallgrid" style="margin-bottom:12px;">
+
+    <div class="kpi">
+        <span class="muted">Records Loaded</span>
+        <b id="recordCount">0</b>
+    </div>
+
+    <div class="kpi">
+        <span class="muted">Selected Record</span>
+        <b id="selectedRecord">1</b>
+    </div>
+
+</div> 
 <h3>Imported Gate Decision</h3>
 <div class="kpi">
     <span class="muted">Provider</span>
@@ -190,6 +203,11 @@ function loadGateRecord(event) {
 
     const metadata = json.export_metadata;
     const record = json.records[0];
+    document.getElementById("recordCount").textContent =
+    json.records.length;
+
+document.getElementById("selectedRecord").textContent =
+    "1";
 
     document.getElementById("providerName").textContent =
         "Mental Health Chat";
