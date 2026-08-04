@@ -55,6 +55,61 @@
     </div>
     <h3>Lumara Clinical Gate</h3><div class="row" id="gateRow"><span>Policy gate status</span><span class="pill yes" id="gateStatus">APPROVED</span></div>
     <p class="muted" id="gateReason">Clinical policy conditions are currently satisfied for the proposed action.</p>
+    <div style="margin-bottom:15px;">
+
+    <button onclick="document.getElementById('gateFile').click()">
+        📁 Import Gate Record
+    </button>
+
+    <input
+        type="file"
+        id="gateFile"
+        accept=".json"
+        style="display:none"
+        onchange="loadGateRecord(event)">
+</div>
+
+<div class="smallgrid" style="margin-bottom:12px;">
+
+    <div class="kpi">
+        <span class="muted">Records Loaded</span>
+        <b id="recordCount">0</b>
+    </div>
+
+    <div class="kpi">
+        <span class="muted">Selected Record</span>
+
+        <select id="recordSelector"
+                style="width:100%;"
+                onchange="changeRecord()">
+            <option value="0">Record 1</option>
+        </select>
+
+    </div>
+
+</div>
+
+<h3>Imported Clinical Governance Decision</h3>
+
+<div class="kpi">
+    <span class="muted">Provider</span>
+    <b id="providerName">Not Loaded</b>
+</div>
+
+<div class="kpi">
+    <span class="muted">Gate Version</span>
+    <b id="gateVersion">-</b>
+</div>
+
+<div class="kpi">
+    <span class="muted">Policy</span>
+    <b id="policyRef">-</b>
+</div>
+
+<div class="kpi">
+    <span class="muted">Integrity</span>
+    <b id="integrityStatus">Unknown</b>
+</div>
     <h3>Runtime Authority State</h3><div class="authority"><div id="aNormal" class="authbox normal">NORMAL</div><div id="aConditional" class="authbox conditional">CONDITIONAL</div><div id="aEscalated" class="authbox escalated">ESCALATED</div><div id="aRestricted" class="authbox restricted">RESTRICTED</div></div>
     <h3>Institutional Justification</h3><div class="justify"><div class="jitem" id="jMonitor">✓ Monitoring</div><div class="jitem" id="jEscalate">✓ Escalation</div><div class="jitem" id="jAuto">✓ Autonomous continuation</div></div>
   </section>
