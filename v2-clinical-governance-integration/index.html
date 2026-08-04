@@ -206,22 +206,8 @@ function loadGateRecord(event) {
     console.log(metadata);
     console.log(record);
 
-}
-    // Use the first record if the JSON contains an array
-    const record = Array.isArray(json) ? json[0] : json;
-
-    document.getElementById("providerName").textContent = "Mental Health Chat";
-
-    document.getElementById("gateVersion").textContent =
-        record.gate_version || "-";
-
-    document.getElementById("policyRef").textContent =
-        record.policy_ref || "-";
-
-    document.getElementById("integrityStatus").textContent =
-        record.chain_hash ? "Verified ✓" : "Unknown";
-
 };
+  
 
     reader.readAsText(file);
 
