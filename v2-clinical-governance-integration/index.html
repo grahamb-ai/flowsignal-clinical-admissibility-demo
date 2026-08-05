@@ -99,7 +99,24 @@
     <span class="muted">Provider</span>
     <b id="providerName">Not Loaded</b>
 </div>
+<div class="card">
+    <h3>Governance Decision</h3>
 
+    <div class="kpi">
+        <span class="muted">Verdict</span><br>
+        <b id="govVerdict">-</b>
+    </div>
+
+    <div class="kpi">
+        <span class="muted">Reason</span><br>
+        <div id="govReason">-</div>
+    </div>
+
+    <div class="kpi">
+        <span class="muted">Conditions</span><br>
+        <div id="govConditions">-</div>
+    </div>
+</div>
 <div class="kpi">
     <span class="muted">Gate Version</span>
     <b id="gateVersion">-</b>
@@ -207,6 +224,7 @@ function loadGateRecord(event) {
    reader.onload = function(e) {
 
     const json = JSON.parse(e.target.result);
+     gateExport = json;
 gateExport = json;
     const metadata = json.export_metadata;
     const record = json.records[0];
@@ -242,6 +260,7 @@ json.records.forEach((record, index) => {
 
     document.getElementById("integrityStatus").textContent =
         "Verified ✓";
+     showGovernanceDecision(record);
 
     console.log(metadata);
     console.log(record);
