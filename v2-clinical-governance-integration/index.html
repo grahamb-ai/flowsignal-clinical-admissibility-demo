@@ -264,7 +264,34 @@ json.records.forEach((record, index) => {
 
     console.log(metadata);
     console.log(record);
+function showGovernanceDecision(record) {
 
+    document.getElementById("govVerdict").textContent =
+        record.verdict || "-";
+
+    document.getElementById("govReason").textContent =
+        record.reason || "-";
+
+    const conditions = document.getElementById("govConditions");
+
+    conditions.innerHTML = "";
+
+    if (record.conditions) {
+
+        record.conditions.forEach(c => {
+
+            const div = document.createElement("div");
+
+            div.textContent =
+                (c.pass ? "✓ " : "✗ ") + c.name;
+
+            conditions.appendChild(div);
+
+        });
+
+    }
+
+}
 changeRecord();
 
 };
