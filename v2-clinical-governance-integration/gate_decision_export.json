@@ -1,1 +1,77 @@
-
+{
+  "export_metadata": {
+    "provider": "FlowSignal Synthetic Clinical Gate",
+    "gate_version": "v2-test-1",
+    "policy_ref": "SYNTHETIC-CLINICAL-GATE-001",
+    "exported_at": "2026-09-18T16:00:00Z",
+    "integrity_scheme": "sha256-canonical-json"
+  },
+  "records": [
+    {
+      "record_id": "GDR-001",
+      "gate_version": "v2-test-1",
+      "policy_ref": "SYNTHETIC-CLINICAL-GATE-001",
+      "verdict": "APPROVED",
+      "reason": "Synthetic baseline: required governance conditions satisfied.",
+      "conditions": [
+        {
+          "name": "identity_verified",
+          "pass": true
+        },
+        {
+          "name": "consent_valid",
+          "pass": true
+        },
+        {
+          "name": "encounter_valid",
+          "pass": true
+        },
+        {
+          "name": "clinician_present",
+          "pass": true
+        },
+        {
+          "name": "evidence_fresh",
+          "pass": true
+        },
+        {
+          "name": "documentation_integrity",
+          "pass": true
+        }
+      ]
+    },
+    {
+      "record_id": "GDR-002",
+      "gate_version": "v2-test-1",
+      "policy_ref": "SYNTHETIC-CLINICAL-GATE-001",
+      "verdict": "BLOCKED",
+      "reason": "Synthetic negative: consent condition failed.",
+      "conditions": [
+        {
+          "name": "identity_verified",
+          "pass": true
+        },
+        {
+          "name": "consent_valid",
+          "pass": false
+        },
+        {
+          "name": "encounter_valid",
+          "pass": true
+        },
+        {
+          "name": "clinician_present",
+          "pass": true
+        },
+        {
+          "name": "evidence_fresh",
+          "pass": true
+        },
+        {
+          "name": "documentation_integrity",
+          "pass": true
+        }
+      ]
+    }
+  ]
+}
