@@ -7,7 +7,7 @@ non-bypassability.
 from __future__ import annotations
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
-import hashlib, hmac, json
+import hashlib, hmac, json, sqlite3, threading
 
 ALLOW="ALLOW"; ESCALATE="ESCALATE"; REFUSE="REFUSE"
 
@@ -69,22 +69,37 @@ def verify_receipt(r:dict,secret:bytes=b"synthetic-test-key")->bool:
     except (KeyError,TypeError):
         return False
 
-class ExecutionGateway:
-    """Represented gateway with process-local one-time receipt consumption.
-
-    Persistence, distributed atomicity and real EPR route closure remain
-    NOT DEMONSTRATED by this reference harness.
-    """
+class MemoryConsumptionStore:
     def __init__(self):
-        self._consumed=set()
+        self._consumed=set(); self._lock=threading.Lock()
+    def claim(self,token:str)->bool:
+        with self._lock:
+            if token in self._consumed: return False
+            self._consumed.add(token); return True
 
+class SQLiteConsumptionStore:
+    """Durable reference store; a unique token provides atomic claiming."""
+    def __init__(self,path):
+        self.path=str(path)
+        with sqlite3.connect(self.path) as db:
+            db.execute("CREATE TABLE IF NOT EXISTS consumed_receipts (token TEXT PRIMARY KEY)")
+    def claim(self,token:str)->bool:
+        try:
+            with sqlite3.connect(self.path,timeout=5) as db:
+                db.execute("INSERT INTO consumed_receipts(token) VALUES (?)",(token,))
+            return True
+        except sqlite3.IntegrityError:
+            return False
+
+class ExecutionGateway:
+    def __init__(self,store=None):
+        self.store=store or MemoryConsumptionStore()
     def execute(self,bound_receipt:dict,attempted:Attempt,current:Conditions)->dict:
-        token=bound_receipt.get("integrity",{}).get("value")
-        if token in self._consumed:
-            return {"status":"BLOCKED","reason_code":"AUTHORITY_RECEIPT_ALREADY_CONSUMED"}
         result=_execute_unconsumed(bound_receipt,attempted,current)
-        if result["status"]=="EPR_COMMIT_PERMITTED":
-            self._consumed.add(token)
+        if result["status"]!="EPR_COMMIT_PERMITTED": return result
+        token=bound_receipt.get("integrity",{}).get("value")
+        if not token or not self.store.claim(token):
+            return {"status":"BLOCKED","reason_code":"AUTHORITY_RECEIPT_ALREADY_CONSUMED"}
         return result
 
 def execute(bound_receipt:dict, attempted:Attempt, current:Conditions)->dict:
