@@ -22,11 +22,11 @@ class HostileTests(unittest.TestCase):
         self.assertEqual("AUTHORITY_STATE_STALE_REEVALUATION_REQUIRED",execute(r,a,rolled)["reason_code"])
 
     def test_duplicate_exact_execution_is_not_yet_prevented(self):
-        # RED TEST: documents missing one-time consumption/non-replay protection.
-        a=attempt(); c=conditions(); r=evaluate(a,c)
-        first=execute(r,a,c); second=execute(r,a,c)
+        # Same challenge after remediation: second use of the same receipt must fail.
+        a=attempt(); c=conditions(); r=evaluate(a,c); gateway=ExecutionGateway()
+        first=gateway.execute(r,a,c); second=gateway.execute(r,a,c)
         self.assertEqual("EPR_COMMIT_PERMITTED",first["status"])
-        self.assertNotEqual("EPR_COMMIT_PERMITTED",second["status"],
-            "FAILURE PRESERVED: same receipt can currently permit represented commit twice")
+        self.assertEqual(("BLOCKED","AUTHORITY_RECEIPT_ALREADY_CONSUMED"),
+                         (second["status"],second["reason_code"]))
 
 if __name__=="__main__": unittest.main()
