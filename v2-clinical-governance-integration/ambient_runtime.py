@@ -69,7 +69,29 @@ def verify_receipt(r:dict,secret:bytes=b"synthetic-test-key")->bool:
     except (KeyError,TypeError):
         return False
 
+class ExecutionGateway:
+    """Represented gateway with process-local one-time receipt consumption.
+
+    Persistence, distributed atomicity and real EPR route closure remain
+    NOT DEMONSTRATED by this reference harness.
+    """
+    def __init__(self):
+        self._consumed=set()
+
+    def execute(self,bound_receipt:dict,attempted:Attempt,current:Conditions)->dict:
+        token=bound_receipt.get("integrity",{}).get("value")
+        if token in self._consumed:
+            return {"status":"BLOCKED","reason_code":"AUTHORITY_RECEIPT_ALREADY_CONSUMED"}
+        result=_execute_unconsumed(bound_receipt,attempted,current)
+        if result["status"]=="EPR_COMMIT_PERMITTED":
+            self._consumed.add(token)
+        return result
+
 def execute(bound_receipt:dict, attempted:Attempt, current:Conditions)->dict:
+    """Stateless compatibility helper; one-time use requires ExecutionGateway."""
+    return _execute_unconsumed(bound_receipt,attempted,current)
+
+def _execute_unconsumed(bound_receipt:dict, attempted:Attempt, current:Conditions)->dict:
     """Represented EPR gateway. Fresh evaluation is mandatory before commit."""
     if not verify_receipt(bound_receipt):
         return {"status":"BLOCKED","reason_code":"RECEIPT_INTEGRITY_FAILED"}
