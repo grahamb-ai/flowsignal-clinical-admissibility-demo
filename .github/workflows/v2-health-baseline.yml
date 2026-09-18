@@ -1,0 +1,24 @@
+name: V2 Health Baseline Tests
+on:
+  push:
+    branches: [v2-health-hardening-airp]
+    paths:
+      - 'v2-clinical-governance-integration/**'
+  pull_request:
+    paths:
+      - 'v2-clinical-governance-integration/**'
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: v2-clinical-governance-integration
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Structural verifier
+        run: python verify_chain.py
+      - name: Boring regression tests
+        run: python -m unittest discover -s tests -v
