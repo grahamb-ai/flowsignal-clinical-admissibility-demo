@@ -36,7 +36,7 @@ class NowStateTransition(unittest.TestCase):
         a=attempt(); old=conditions(state_version=1); receipt=evaluate(a,old)
         self.assertEqual(ALLOW,receipt["decision"])
         current=conditions(consent_valid=False,state_version=2)
-        result=execute(receipt,a,current)
+        result=ExecutionGateway().execute(receipt,a,current)
         self.assertEqual(("BLOCKED","AUTHORITY_STATE_STALE_REEVALUATION_REQUIRED"),(result["status"],result["reason_code"]))
 
     def test_fresh_evaluation_after_change_refuses(self):
@@ -47,7 +47,7 @@ class WhoWhatMatchBinding(unittest.TestCase):
     def setUp(self):
         self.a=attempt(); self.c=conditions(); self.r=evaluate(self.a,self.c)
     def assertBlocked(self,**mutation):
-        x=attempt(**mutation); got=execute(self.r,x,self.c)
+        x=attempt(**mutation); got=ExecutionGateway().execute(self.r,x,self.c)
         self.assertEqual(("BLOCKED","ACTION_BINDING_MISMATCH"),(got["status"],got["reason_code"]))
     def test_who_actor_substitution(self): self.assertBlocked(actor_id="clinician-999")
     def test_match_patient_substitution(self): self.assertBlocked(patient_id="patient-999")
@@ -56,6 +56,6 @@ class WhoWhatMatchBinding(unittest.TestCase):
     def test_match_content_substitution(self): self.assertBlocked(content_digest="sha256:draft-b")
     def test_what_mandate_substitution(self): self.assertBlocked(mandate_id="mandate-999")
     def test_exact_bound_attempt_permits_represented_commit(self):
-        self.assertEqual("EPR_COMMIT_PERMITTED",execute(self.r,self.a,self.c)["status"])
+        self.assertEqual("EPR_COMMIT_PERMITTED",ExecutionGateway().execute(self.r,self.a,self.c)["status"])
 
 if __name__=="__main__": unittest.main()
