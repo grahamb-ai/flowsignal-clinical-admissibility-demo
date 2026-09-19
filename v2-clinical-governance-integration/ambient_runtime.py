@@ -96,11 +96,11 @@ class ExecutionGateway:
         self.store=store or MemoryConsumptionStore()
     def execute(self,bound_receipt:dict,attempted:Attempt,current:Conditions)->dict:
         result=_execute_unconsumed(bound_receipt,attempted,current)
-        if result["status"]!="EPR_COMMIT_PERMITTED": return result
+        if result["status"]!="ADMISSIBLE": return result
         token=bound_receipt.get("integrity",{}).get("value")
         if not token or not self.store.claim(token):
             return {"status":"BLOCKED","reason_code":"AUTHORITY_RECEIPT_ALREADY_CONSUMED"}
-        return result
+        return {"status":"EPR_COMMIT_PERMITTED","reason_code":result["reason_code"],"receipt":result["receipt"]}
 
 def execute(bound_receipt:dict, attempted:Attempt, current:Conditions)->dict:
     """Legacy compatibility entry point. It cannot form a represented consequence."""
@@ -110,7 +110,7 @@ def execute(bound_receipt:dict, attempted:Attempt, current:Conditions)->dict:
     }
 
 def _execute_unconsumed(bound_receipt:dict, attempted:Attempt, current:Conditions)->dict:
-    """Represented EPR gateway. Fresh evaluation is mandatory before commit."""
+    """Validate admissibility only. This helper cannot form a represented consequence."""
     if not verify_receipt(bound_receipt):
         return {"status":"BLOCKED","reason_code":"RECEIPT_INTEGRITY_FAILED"}
     if bound_receipt["action_binding_hash"] != binding_hash(attempted):
@@ -119,5 +119,5 @@ def _execute_unconsumed(bound_receipt:dict, attempted:Attempt, current:Condition
         return {"status":"BLOCKED","reason_code":"AUTHORITY_STATE_STALE_REEVALUATION_REQUIRED"}
     fresh=evaluate(attempted,current)
     if fresh["decision"]==ALLOW:
-        return {"status":"EPR_COMMIT_PERMITTED","reason_code":fresh["reason_code"],"receipt":fresh}
+        return {"status":"ADMISSIBLE","reason_code":fresh["reason_code"],"receipt":fresh}
     return {"status":"BLOCKED","reason_code":fresh["reason_code"],"receipt":fresh}
