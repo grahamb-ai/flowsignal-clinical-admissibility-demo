@@ -103,8 +103,11 @@ class ExecutionGateway:
         return result
 
 def execute(bound_receipt:dict, attempted:Attempt, current:Conditions)->dict:
-    """Stateless compatibility helper; one-time use requires ExecutionGateway."""
-    return _execute_unconsumed(bound_receipt,attempted,current)
+    """Legacy compatibility entry point. It cannot form a represented consequence."""
+    return {
+        "status":"BLOCKED",
+        "reason_code":"EXECUTION_GATEWAY_REQUIRED"
+    }
 
 def _execute_unconsumed(bound_receipt:dict, attempted:Attempt, current:Conditions)->dict:
     """Represented EPR gateway. Fresh evaluation is mandatory before commit."""
