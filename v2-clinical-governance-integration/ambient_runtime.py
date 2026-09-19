@@ -91,10 +91,36 @@ class SQLiteConsumptionStore:
         except sqlite3.IntegrityError:
             return False
 
+class MemoryAuthorityStateStore:
+    """Reference authoritative state source keyed by governed execution context."""
+    def __init__(self):
+        self._states={}; self._lock=threading.Lock()
+    @staticmethod
+    def key(attempted:Attempt):
+        return (attempted.patient_id,attempted.encounter_id,attempted.mandate_id)
+    def set(self,attempted:Attempt,current:Conditions):
+        with self._lock:
+            key=self.key(attempted)
+            previous=self._states.get(key)
+            if previous is not None and current.state_version < previous.state_version:
+                raise ValueError("AUTHORITY_STATE_ROLLBACK_REJECTED")
+            self._states[key]=current
+    def get(self,attempted:Attempt):
+        with self._lock:
+            return self._states.get(self.key(attempted))
+
 class ExecutionGateway:
-    def __init__(self,store=None):
+    def __init__(self,store=None,state_provider=None):
         self.store=store or MemoryConsumptionStore()
-    def execute(self,bound_receipt:dict,attempted:Attempt,current:Conditions)->dict:
+        self.state_provider=state_provider
+    def execute(self,bound_receipt:dict,attempted:Attempt,current:Conditions=None)->dict:
+        if self.state_provider is not None:
+            authoritative_current=self.state_provider.get(attempted)
+            if authoritative_current is None:
+                return {"status":"BLOCKED","reason_code":"AUTHORITATIVE_STATE_UNAVAILABLE"}
+            current=authoritative_current
+        elif current is None:
+            return {"status":"BLOCKED","reason_code":"AUTHORITATIVE_STATE_REQUIRED"}
         result=_execute_unconsumed(bound_receipt,attempted,current)
         if result["status"]!="ADMISSIBLE": return result
         token=bound_receipt.get("integrity",{}).get("value")
