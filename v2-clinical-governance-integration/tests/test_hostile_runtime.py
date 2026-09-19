@@ -8,18 +8,18 @@ from test_ambient_runtime import attempt, conditions
 class HostileTests(unittest.TestCase):
     def test_tampered_receipt_blocked(self):
         a=attempt(); r=evaluate(a,conditions()); r["decision"]="ALLOW"; r["attempt"]["patient_id"]="victim"
-        self.assertEqual("RECEIPT_INTEGRITY_FAILED",execute(r,a,conditions())["reason_code"])
+        self.assertEqual("RECEIPT_INTEGRITY_FAILED",ExecutionGateway().execute(r,a,conditions())["reason_code"])
 
     def test_fail_open_not_permitted_when_clinician_disappears(self):
         a=attempt(); r=evaluate(a,conditions(state_version=1))
         cur=conditions(clinician_present=False,state_version=2)
-        self.assertEqual("BLOCKED",execute(r,a,cur)["status"])
+        self.assertEqual("BLOCKED",ExecutionGateway().execute(r,a,cur)["status"])
 
     def test_coherent_rollback_old_state_version_cannot_reuse_receipt(self):
         a=attempt(); r=evaluate(a,conditions(state_version=7))
         # attacker presents otherwise-valid earlier-looking state
         rolled=conditions(state_version=6)
-        self.assertEqual("AUTHORITY_STATE_STALE_REEVALUATION_REQUIRED",execute(r,a,rolled)["reason_code"])
+        self.assertEqual("AUTHORITY_STATE_STALE_REEVALUATION_REQUIRED",ExecutionGateway().execute(r,a,rolled)["reason_code"])
 
     def test_duplicate_exact_execution_is_not_yet_prevented(self):
         # Same challenge after remediation: second use of the same receipt must fail.
