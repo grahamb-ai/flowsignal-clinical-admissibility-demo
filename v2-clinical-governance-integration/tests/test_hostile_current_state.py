@@ -16,9 +16,15 @@ class CallerSuppliedCurrentStateHostileTest(unittest.TestCase):
         authoritative_now=conditions(consent_valid=False,state_version=2)
         self.assertEqual(runtime.REFUSE,runtime.evaluate(a,authoritative_now)["decision"])
 
+        # The gateway owns the final NOW lookup. Authoritative state is v2.
+        state_store=runtime.MemoryAuthorityStateStore()
+        state_store.set(a,authoritative_now)
+        gateway=runtime.ExecutionGateway(state_provider=state_store)
+
         # Hostile caller lies by supplying the old coherent v1 snapshot as "current".
+        # The gateway must ignore it and use its authoritative state provider.
         attacker_supplied_current=conditions(consent_valid=True,state_version=1)
-        result=runtime.ExecutionGateway().execute(receipt,a,attacker_supplied_current)
+        result=gateway.execute(receipt,a,attacker_supplied_current)
 
         self.assertNotEqual(
             "EPR_COMMIT_PERMITTED",result["status"],
